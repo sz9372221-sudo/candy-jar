@@ -1,0 +1,690 @@
+/* ==========================================================
+   Candy Jar of Kind Words
+   ========================================================== */
+
+:root {
+  color-scheme: light;
+
+  --pastel-pink: #FFD6E8;
+  --soft-white: #FFFDFB;
+  --candy-pink: #FF9EC4;
+  --lavender: #E8D9FF;
+  --soft-gold: #FFE29A;
+
+  --ink: #614758;
+  --muted: #795D70;
+  --deep-pink: #98446D;
+
+  --font-display: "Fredoka", "Trebuchet MS", sans-serif;
+  --font-body: "Quicksand", "Segoe UI", sans-serif;
+
+  --radius-small: 12px;
+  --radius-medium: 18px;
+  --radius-large: 28px;
+  --radius-pill: 999px;
+
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+}
+
+/* Base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html {
+  min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 280px;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    linear-gradient(
+      160deg,
+      var(--pastel-pink) 0%,
+      var(--soft-white) 52%,
+      var(--lavender) 100%
+    );
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+p,
+figure {
+  margin: 0;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+h1 {
+  font-size: clamp(2rem, 6vw, 3.1rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+h2 {
+  font-size: clamp(1.6rem, 5vw, 1.9rem);
+}
+
+p {
+  line-height: 1.65;
+}
+
+::selection {
+  color: var(--ink);
+  background: var(--pastel-pink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--deep-pink);
+  outline-offset: 4px;
+}
+
+#jar-title:focus {
+  outline: none;
+}
+
+/* Background decorations */
+
+.decorations {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.decorations span {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  color: #D77EA5;
+  font-size: 22px;
+  opacity: .36;
+  animation:
+    decoration-float var(--duration, 10s)
+    ease-in-out var(--delay, 0s) infinite;
+}
+
+.decorations span:nth-child(3n + 2) {
+  color: #BE942F;
+  font-size: 20px;
+}
+
+.decorations span:nth-child(3n) {
+  color: #A38ABB;
+  font-size: 18px;
+}
+
+@keyframes decoration-float {
+  0%, 100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+/* Page layout */
+
+.app {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: min(100%, 900px);
+  min-height: 100vh;
+  min-height: 100svh;
+  margin-inline: auto;
+  padding: 26px 20px 125px;
+  text-align: center;
+}
+
+.app.is-home {
+  justify-content: center;
+  padding-bottom: 36px;
+}
+
+.jar-heading {
+  display: grid;
+  gap: 10px;
+  max-width: 580px;
+}
+
+.eyebrow {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+.subtitle,
+.hint {
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.home-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.local-note {
+  max-width: 440px;
+  color: var(--muted);
+  font-size: .75rem;
+}
+
+.status {
+  min-height: 1.6em;
+  max-width: 450px;
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+/* Buttons */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 14px 24px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--soft-white);
+  color: var(--ink);
+  font: 500 1.05rem var(--font-display);
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 180ms var(--ease-out),
+    background-color 180ms ease;
+}
+
+.button-pink {
+  background: linear-gradient(#FFB9D6, var(--candy-pink));
+  box-shadow:
+    0 4px 0 #DD87AF,
+    0 10px 22px #D793B426;
+}
+
+.button-lavender {
+  background: linear-gradient(#F2E9FF, var(--lavender));
+  box-shadow:
+    0 4px 0 #C8AFEA,
+    0 10px 22px #BFA3DB20;
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.button:disabled {
+  cursor: default;
+  opacity: .65;
+}
+
+.back-button {
+  align-self: flex-start;
+  min-height: 42px;
+  padding: 9px 17px;
+  border: 1px solid var(--pastel-pink);
+  background: #FFFFFFB3;
+  font: 700 .86rem var(--font-body);
+}
+
+.add-button {
+  position: fixed;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  z-index: 10;
+  min-height: 54px;
+}
+
+.add-button:disabled {
+  opacity: 1;
+  background: #EEE5EA;
+  color: #796771;
+  box-shadow: 0 3px 0 #D6C7D0;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+}
+
+/* Jar */
+
+.jar-figure {
+  position: relative;
+  isolation: isolate;
+  flex-shrink: 0;
+  width: min(100%, 410px);
+}
+
+.is-home .jar-figure {
+  width: min(100%, 380px);
+}
+
+.jar-svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Visual glass must not intercept candy clicks. */
+.glass-decoration {
+  pointer-events: none;
+}
+
+.jar-glow {
+  position: absolute;
+  z-index: -1;
+  inset: 8% -5% 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse,
+      #FFFFFFD9,
+      #FFD6E84D 45%,
+      transparent 72%
+    );
+  pointer-events: none;
+}
+
+.jar-shadow {
+  position: absolute;
+  z-index: -1;
+  bottom: 3%;
+  left: 18%;
+  width: 64%;
+  height: 7%;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse,
+      #82609340,
+      transparent 72%
+    );
+  pointer-events: none;
+}
+
+.jar-figure.is-full .jar-glow {
+  background:
+    radial-gradient(
+      ellipse,
+      #FFFDFBF2,
+      #FFE29A66 42%,
+      #FFD6E833 60%,
+      transparent 74%
+    );
+}
+
+/* Candy interactions */
+
+.candy-button {
+  cursor: pointer;
+  outline: none;
+}
+
+.candy-art {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 180ms var(--ease-out);
+}
+
+.candy-focus-ring {
+  opacity: 0;
+  fill: none;
+  stroke: var(--deep-pink);
+  stroke-width: 2;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+
+.candy-button:focus-visible .candy-focus-ring {
+  opacity: 1;
+}
+
+.candy-incoming {
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .candy-button:hover .candy-art {
+    transform: translateY(-2px) rotate(-3deg);
+  }
+}
+
+/* Counter, code and full card */
+
+.count-card {
+  display: grid;
+  gap: 7px;
+  margin-top: -12px;
+}
+
+.candy-counter {
+  font: 500 1.3rem var(--font-display);
+}
+
+.candy-counter strong {
+  color: var(--deep-pink);
+  font-weight: 500;
+}
+
+.code-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 100%;
+  padding: 10px 16px;
+  border: 2px dashed var(--candy-pink);
+  border-radius: 24px;
+  background: #FFFFFFB3;
+}
+
+.code-label {
+  font-size: .73rem;
+  font-weight: 700;
+}
+
+.code-value {
+  color: var(--deep-pink);
+  font: 500 1.5rem var(--font-display);
+  letter-spacing: .15em;
+  user-select: all;
+}
+
+.copy-button {
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--soft-gold);
+  font-weight: 700;
+  font-size: .85rem;
+  cursor: pointer;
+}
+
+.full-card {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  max-width: 100%;
+  padding: 19px 24px 23px;
+  border: 1px solid #E9CD91;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #FFFDFBE6, #FFE29A70);
+  box-shadow: 0 8px 25px #A782B014;
+}
+
+.full-card > p {
+  font: 500 1.3rem var(--font-display);
+}
+
+/* Native dialogs */
+
+.modal {
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 36px 26px 30px;
+  overflow-y: auto;
+  border: 2px solid var(--pastel-pink);
+  border-radius: var(--radius-large);
+  color: var(--ink);
+  background: linear-gradient(150deg, var(--soft-white) 65%, #F5EBFF);
+  box-shadow: 0 22px 70px #61475840;
+  text-align: center;
+  transform-origin: center;
+}
+
+.modal::backdrop {
+  background: #61475855;
+  backdrop-filter: blur(5px);
+  animation: backdrop-in 180ms ease-out;
+}
+
+.modal.is-closing::backdrop {
+  animation: backdrop-out 150ms ease-in forwards;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--pastel-pink);
+  cursor: pointer;
+}
+
+.modal-icon {
+  margin-bottom: 8px;
+  font-size: 2.4rem;
+}
+
+.modal-description {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.modal label {
+  display: block;
+  margin: 21px 0 8px;
+  font-size: .92rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.modal input,
+.modal textarea {
+  display: block;
+  width: 100%;
+  padding: 13px 15px;
+  border: 2px solid var(--pastel-pink);
+  border-radius: var(--radius-medium);
+  background: #FFFFFFD9;
+  font-size: 1rem;
+}
+
+.modal input::placeholder,
+.modal textarea::placeholder {
+  color: #886879;
+}
+
+.modal textarea {
+  min-height: 132px;
+  resize: vertical;
+  line-height: 1.65;
+}
+
+#join-code-input {
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.message-meta {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: .72rem;
+}
+
+#message-count {
+  margin-left: auto;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.submit-button {
+  width: 100%;
+  margin-top: 22px;
+}
+
+.form-error {
+  margin-top: 13px;
+  padding: 10px 12px;
+  border-radius: var(--radius-small);
+  background: #FFD6E873;
+  color: #903459;
+  font-size: .85rem;
+}
+
+/* Candy notes */
+
+.candy-note {
+  margin-top: 21px;
+  padding: 24px 20px;
+  border: 1px dashed #DCA4BC;
+  border-radius: var(--radius-medium);
+  background: linear-gradient(155deg, var(--soft-white), #FFD6E84D);
+}
+
+.note-heart {
+  color: #A14F76;
+  font-size: 1.7rem;
+}
+
+#note-message {
+  margin-top: 10px;
+  color: var(--ink);
+  font-size: 1.08rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.note-return {
+  margin-top: 22px;
+}
+
+.noscript-message {
+  padding: 20px;
+  text-align: center;
+}
+
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Responsive */
+
+@media (max-width: 480px) {
+  .app {
+    gap: 16px;
+    padding: 20px 16px 120px;
+  }
+
+  .app.is-home {
+    padding-bottom: 28px;
+  }
+
+  .jar-figure,
+  .is-home .jar-figure {
+    width: min(100%, 350px);
+  }
+
+  .home-actions {
+    gap: 12px;
+  }
+
+  .home-actions .button {
+    padding: 13px 16px;
+    font-size: .97rem;
+  }
+
+  .add-button {
+    right: 16px;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    max-width: calc(100vw - 32px);
+    font-size: 1rem;
+  }
+
+  .modal {
+    padding: 36px 22px 28px;
+  }
+
+  .subtitle,
+  .hint {
+    font-size: .85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .candy-button:hover .candy-art {
+    transform: none;
+  }
+}

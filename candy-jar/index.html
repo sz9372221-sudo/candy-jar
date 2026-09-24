@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FFD6E8">
+  <meta
+    name="description"
+    content="A little candy jar filled with kind words."
+  >
+  <title>Candy Jar of Kind Words</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Quicksand:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="decorations" aria-hidden="true">
+    <span style="--x:8%;--y:16%;--delay:-2s;--duration:9s">♥</span>
+    <span style="--x:86%;--y:12%;--delay:-5s;--duration:12s">✦</span>
+    <span style="--x:24%;--y:68%;--delay:-1s;--duration:10s">✧</span>
+    <span style="--x:83%;--y:72%;--delay:-4s;--duration:11s">♥</span>
+    <span style="--x:66%;--y:32%;--delay:-6s;--duration:13s">✦</span>
+    <span style="--x:12%;--y:87%;--delay:-3s;--duration:10s">✧</span>
+    <span style="--x:39%;--y:8%;--delay:-7s;--duration:12s">✧</span>
+  </div>
+
+  <main id="app" class="app is-home">
+    <button
+      id="back-button"
+      class="button back-button"
+      type="button"
+      hidden
+    >
+      ← Back home
+    </button>
+
+    <header id="jar-heading" class="jar-heading" hidden>
+      <p class="eyebrow">A little home for kindness</p>
+      <h1 id="jar-title" tabindex="-1">My Jar</h1>
+      <p class="subtitle">
+        Every kind word is something sweet to keep.
+      </p>
+    </header>
+
+    <figure id="jar-figure" class="jar-figure">
+      <div class="jar-glow" aria-hidden="true"></div>
+      <div class="jar-shadow" aria-hidden="true"></div>
+
+      <svg
+        id="jar-svg"
+        class="jar-svg"
+        viewBox="0 0 360 420"
+        xmlns="http://www.w3.org/2000/svg"
+        role="group"
+        aria-labelledby="jar-svg-title"
+      >
+        <title id="jar-svg-title">An empty glass candy jar</title>
+
+        <defs>
+          <linearGradient id="glass-gradient" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#FFFFFF" stop-opacity=".8"/>
+            <stop offset=".18" stop-color="#FFFFFF" stop-opacity=".13"/>
+            <stop offset=".55" stop-color="#FFD6E8" stop-opacity=".08"/>
+            <stop offset=".84" stop-color="#E8D9FF" stop-opacity=".3"/>
+            <stop offset="1" stop-color="#FFFFFF" stop-opacity=".8"/>
+          </linearGradient>
+
+          <linearGradient id="edge-gradient" x1="0" y1="0" x2="1" y2="1">
+            <stop stop-color="#FFFFFF"/>
+            <stop offset=".5" stop-color="#CDB2D2" stop-opacity=".8"/>
+            <stop offset=".8" stop-color="#BBA5D1" stop-opacity=".65"/>
+            <stop offset="1" stop-color="#FFFFFF"/>
+          </linearGradient>
+
+          <linearGradient id="lid-gradient" x1="0" y1="0" x2="0" y2="1">
+            <stop stop-color="#FFFDFB"/>
+            <stop offset=".48" stop-color="#FFD6E8"/>
+            <stop offset="1" stop-color="#D9C2F0"/>
+          </linearGradient>
+
+          <linearGradient id="gold-gradient" x1="0" y1="0" x2="0" y2="1">
+            <stop stop-color="#FFF6DA"/>
+            <stop offset=".5" stop-color="#FFE29A"/>
+            <stop offset="1" stop-color="#D9B775"/>
+          </linearGradient>
+
+          <linearGradient id="bow-gradient" x1="0" y1="0" x2="1" y2="1">
+            <stop stop-color="#FFD6E8"/>
+            <stop offset=".55" stop-color="#FF9EC4"/>
+            <stop offset="1" stop-color="#DC7BA7"/>
+          </linearGradient>
+
+          <linearGradient id="front-gradient" x1="0" y1="0" x2="0" y2="1">
+            <stop stop-color="#FFFFFF" stop-opacity=".12"/>
+            <stop offset=".65" stop-color="#FFFFFF" stop-opacity="0"/>
+            <stop offset="1" stop-color="#E8D9FF" stop-opacity=".2"/>
+          </linearGradient>
+
+          <clipPath id="jar-interior-clip">
+            <path
+              d="M108 146H252
+                 C252 165 293 174 293 208
+                 V326Q293 377 248 377
+                 H112Q67 377 67 326
+                 V208C67 174 108 165 108 146Z"
+            />
+          </clipPath>
+
+          <clipPath id="candy-circle-clip">
+            <circle r="12"/>
+          </clipPath>
+        </defs>
+
+        <!-- Back glass -->
+        <g class="glass-decoration" aria-hidden="true">
+          <path
+            d="M102 133H258V148
+               C258 167 304 174 304 209
+               V329Q304 390 249 390
+               H111Q56 390 56 329
+               V209C56 174 102 167 102 148Z"
+            fill="url(#glass-gradient)"
+            stroke="url(#edge-gradient)"
+            stroke-width="3"
+          />
+
+          <ellipse
+            cx="180" cy="369" rx="104" ry="15"
+            fill="#BFAEDB" opacity=".13"
+          />
+        </g>
+
+        <!-- Candy contents and front glass -->
+        <g id="jar-interior" clip-path="url(#jar-interior-clip)">
+          <g id="candy-layer"></g>
+
+          <path
+            class="glass-decoration"
+            d="M60 144H300V390H60Z"
+            fill="url(#front-gradient)"
+            aria-hidden="true"
+          />
+        </g>
+
+        <!-- Reflections and lid sit in front of candies. -->
+        <g class="glass-decoration" aria-hidden="true">
+          <path
+            d="M102 177Q77 189 77 222V290"
+            fill="none"
+            stroke="#FFFFFF"
+            stroke-width="12"
+            stroke-linecap="round"
+            opacity=".73"
+          />
+          <path
+            d="M78 310V327"
+            fill="none"
+            stroke="#FFFFFF"
+            stroke-width="8"
+            stroke-linecap="round"
+            opacity=".62"
+          />
+          <path
+            d="M269 183Q289 199 289 224V315"
+            fill="none"
+            stroke="#FFFFFF"
+            stroke-width="5"
+            stroke-linecap="round"
+            opacity=".58"
+          />
+          <path
+            d="M76 349Q79 379 112 379H248Q281 379 284 349"
+            fill="none"
+            stroke="#FFFFFF"
+            stroke-width="7"
+            opacity=".58"
+          />
+          <path
+            d="M109 382H244"
+            fill="none"
+            stroke="#FFFFFF"
+            stroke-width="3"
+            stroke-linecap="round"
+            opacity=".8"
+          />
+
+          <rect
+            x="100" y="127" width="160" height="25" rx="10"
+            fill="url(#glass-gradient)"
+            stroke="url(#edge-gradient)"
+            stroke-width="2"
+          />
+          <ellipse
+            cx="180" cy="145" rx="79" ry="8"
+            fill="none" stroke="#FFFFFF"
+            stroke-width="2" opacity=".65"
+          />
+
+          <path
+            d="M91 120Q99 72 180 72Q261 72 269 120Z"
+            fill="url(#lid-gradient)"
+            stroke="#CBAECC"
+            stroke-width="2"
+          />
+          <path
+            d="M113 101Q132 82 167 83"
+            fill="none"
+            stroke="#FFFFFF"
+            stroke-width="6"
+            stroke-linecap="round"
+            opacity=".85"
+          />
+          <rect
+            x="88" y="117" width="184" height="17" rx="8.5"
+            fill="url(#gold-gradient)"
+            stroke="#D6B77E"
+            stroke-width="1.5"
+          />
+          <path
+            d="M100 122H258"
+            stroke="#FFFDFB"
+            stroke-width="2"
+            opacity=".75"
+          />
+
+          <path
+            d="M180 35Q159 52 168 67Q180 77 192 67Q201 52 180 35Z"
+            fill="url(#lid-gradient)"
+            stroke="#CBAECC"
+            stroke-width="2"
+          />
+          <path
+            d="M178 44Q170 53 173 59"
+            fill="none"
+            stroke="#FFFFFF"
+            stroke-width="4"
+            stroke-linecap="round"
+          />
+
+          <g
+            fill="url(#bow-gradient)"
+            stroke="#D985AB"
+            stroke-width="1.5"
+            stroke-linejoin="round"
+          >
+            <path d="M174 116L155 153L152 139L139 141L165 113Z"/>
+            <path d="M186 116L205 153L208 139L221 141L195 113Z"/>
+            <path
+              d="M178 110C142 78 129 92 137 116
+                 C143 132 163 122 178 116Z"
+            />
+            <path
+              d="M182 110C218 78 231 92 223 116
+                 C217 132 197 122 182 116Z"
+            />
+            <rect x="171" y="104" width="18" height="20" rx="7"/>
+          </g>
+
+          <path
+            d="M143 99Q154 98 167 108M195 108Q208 98 217 99"
+            fill="none"
+            stroke="#FFFDFB"
+            stroke-width="3"
+            stroke-linecap="round"
+            opacity=".65"
+          />
+        </g>
+      </svg>
+    </figure>
+
+    <div id="home-actions" class="home-actions">
+      <button
+        id="create-button"
+        class="button button-pink"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="create-dialog"
+      >
+        🎀 Create a Jar
+      </button>
+
+      <button
+        id="join-button"
+        class="button button-lavender"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="join-dialog"
+      >
+        🍬 Join a Jar
+      </button>
+    </div>
+
+    <div id="count-card" class="count-card" hidden>
+      <p class="candy-counter">
+        <strong id="candy-count">0</strong> / 50 Candies
+      </p>
+      <p id="candy-hint" class="hint">
+        A little empty, a lot of possibility ✨
+      </p>
+    </div>
+
+    <div id="full-card" class="full-card" hidden>
+      <p>🍬 This jar is full!</p>
+      <button
+        id="create-another-button"
+        class="button button-lavender"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="create-dialog"
+      >
+        Create a New Jar
+      </button>
+    </div>
+
+    <div id="code-card" class="code-card" hidden>
+      <span class="code-label">Jar Code</span>
+      <span id="jar-code" class="code-value"></span>
+      <button id="copy-button" class="copy-button" type="button">
+        Copy
+      </button>
+    </div>
+
+    <p class="local-note">
+      Local preview: jars and messages stay in this browser.
+      Codes do not work across devices yet.
+    </p>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <button
+      id="add-button"
+      class="button button-pink add-button"
+      type="button"
+      aria-haspopup="dialog"
+      aria-controls="add-dialog"
+      hidden
+    >
+      🍬 Add a Candy
+    </button>
+  </main>
+
+  <!-- Create jar -->
+  <dialog
+    id="create-dialog"
+    class="modal"
+    aria-labelledby="create-title"
+    aria-describedby="create-description"
+  >
+    <button
+      class="modal-close"
+      type="button"
+      aria-label="Close"
+      data-close
+    >✕</button>
+
+    <div class="modal-icon" aria-hidden="true">🎀</div>
+    <h2 id="create-title">Name Your Jar</h2>
+    <p id="create-description" class="modal-description">
+      A sweet little home for kind words.
+    </p>
+
+    <form id="create-form">
+      <label for="jar-name-input">Jar name</label>
+      <input
+        id="jar-name-input"
+        name="name"
+        type="text"
+        maxlength="24"
+        placeholder="Kindness Corner"
+        autocomplete="off"
+        required
+        autofocus
+      >
+
+      <p id="create-error" class="form-error" role="alert" hidden></p>
+
+      <button class="button button-pink submit-button" type="submit">
+        ✨ Create My Jar
+      </button>
+    </form>
+  </dialog>
+
+  <!-- Join jar -->
+  <dialog
+    id="join-dialog"
+    class="modal"
+    aria-labelledby="join-title"
+    aria-describedby="join-description"
+  >
+    <button
+      class="modal-close"
+      type="button"
+      aria-label="Close"
+      data-close
+    >✕</button>
+
+    <div class="modal-icon" aria-hidden="true">🍬</div>
+    <h2 id="join-title">Find Your Jar</h2>
+    <p id="join-description" class="modal-description">
+      Enter your six-character jar code.
+    </p>
+
+    <form id="join-form">
+      <label for="join-code-input">Jar code</label>
+      <input
+        id="join-code-input"
+        name="code"
+        type="text"
+        maxlength="6"
+        minlength="6"
+        pattern="[A-Za-z0-9]{6}"
+        title="Enter six letters or numbers."
+        placeholder="ABC234"
+        autocomplete="off"
+        autocapitalize="characters"
+        spellcheck="false"
+        required
+        autofocus
+      >
+
+      <p id="join-error" class="form-error" role="alert" hidden></p>
+
+      <button class="button button-lavender submit-button" type="submit">
+        ✨ Open Jar
+      </button>
+    </form>
+  </dialog>
+
+  <!-- Add candy -->
+  <dialog
+    id="add-dialog"
+    class="modal"
+    aria-labelledby="add-title"
+    aria-describedby="add-description"
+  >
+    <button
+      class="modal-close"
+      type="button"
+      aria-label="Close"
+      data-close
+    >✕</button>
+
+    <div class="modal-icon" aria-hidden="true">🍬</div>
+    <h2 id="add-title">A Little Sweetness</h2>
+    <p id="add-description" class="modal-description">
+      A few kind words can brighten someone’s whole day.
+    </p>
+
+    <form id="add-form">
+      <label for="message-input">Your kind message</label>
+      <textarea
+        id="message-input"
+        name="message"
+        rows="4"
+        maxlength="150"
+        placeholder="You make the world a little brighter…"
+        aria-describedby="message-count"
+        required
+        autofocus
+      ></textarea>
+
+      <div class="message-meta">
+        <span>A little kindness goes a long way ♡</span>
+        <span id="message-count">0 / 150</span>
+      </div>
+
+      <p id="add-error" class="form-error" role="alert" hidden></p>
+
+      <button class="button button-pink submit-button" type="submit">
+        Add to Jar
+      </button>
+    </form>
+  </dialog>
+
+  <!-- Read a candy note -->
+  <dialog
+    id="note-dialog"
+    class="modal note-modal"
+    aria-labelledby="note-title"
+  >
+    <button
+      class="modal-close"
+      type="button"
+      aria-label="Close note"
+      data-close
+      autofocus
+    >✕</button>
+
+    <div class="modal-icon" aria-hidden="true">💌</div>
+    <h2 id="note-title">A Sweet Little Note</h2>
+
+    <div class="candy-note">
+      <span class="note-heart" aria-hidden="true">♡</span>
+      <p id="note-message"></p>
+    </div>
+
+    <button
+      class="button button-lavender note-return"
+      type="button"
+      data-close
+    >
+      Back to the Jar
+    </button>
+  </dialog>
+
+  <noscript>
+    <p class="noscript-message">
+      Please enable JavaScript to create and open candy jars.
+    </p>
+  </noscript>
+</body>
+</html>
