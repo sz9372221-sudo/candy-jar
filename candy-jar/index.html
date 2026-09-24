@@ -335,6 +335,17 @@
     <p id="status" class="status" role="status" aria-live="polite"></p>
 
     <button
+      id="jars-fab-button"
+      class="jars-fab"
+      type="button"
+      aria-haspopup="dialog"
+      aria-controls="jars-drawer"
+      hidden
+    >
+      🍯 My Jars
+    </button>
+
+    <button
       id="add-button"
       class="button button-pink add-button"
       type="button"
@@ -509,6 +520,41 @@
       Back to the Jar
     </button>
   </dialog>
+
+  <!-- My sweet jars shelf -->
+  <div id="jars-drawer" class="jars-drawer" hidden>
+    <div class="jars-drawer-backdrop" data-close-jars></div>
+
+    <aside
+      id="jars-drawer-panel"
+      class="jars-drawer-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="jars-drawer-title"
+    >
+      <header class="jars-drawer-head">
+        <h2 id="jars-drawer-title" class="jars-drawer-title">
+          My Sweet Jars 🎀
+        </h2>
+
+        <button
+          id="jars-drawer-close"
+          class="jars-drawer-close"
+          type="button"
+          aria-label="Close your sweet jars shelf"
+          data-close-jars
+        >✕</button>
+      </header>
+
+      <div class="jars-drawer-content"></div>
+
+      <span class="jars-drawer-sparkle" aria-hidden="true">✧</span>
+      <span
+        class="jars-drawer-sparkle jars-drawer-sparkle-second"
+        aria-hidden="true"
+      >♥</span>
+    </aside>
+  </div>
 
   <noscript>
     <p class="noscript-message">

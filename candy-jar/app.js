@@ -27,6 +27,7 @@
   let addingCandy = false;
   let openingCandy = false;
   let cancelFlight = null;
+  let closingDrawer = false;
 
   const closingDialogs = new WeakMap();
   const dialogAnimations = new WeakMap();
@@ -274,6 +275,62 @@
     task.finally(() => closingDialogs.delete(dialog));
 
     return task;
+  }
+
+  /* ========================================================
+     My Jars shelf drawer
+     ======================================================== */
+
+  function isDrawerOpen() {
+    return $("jars-drawer").classList.contains("is-open");
+  }
+
+  function openJarsDrawer() {
+    const drawer = $("jars-drawer");
+
+    if (isDrawerOpen()) return;
+
+    drawer.hidden = false;
+    // Let the browser paint the hidden→visible state before
+    // transitioning, so the slide-in animation plays.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        drawer.classList.add("is-open");
+      });
+    });
+
+    document.body.classList.add("jars-open");
+
+    if (!reducedMotion()) {
+      $("jars-drawer-close").focus({ preventScroll: true });
+    }
+  }
+
+  function closeJarsDrawer() {
+    const drawer = $("jars-drawer");
+
+    if (!isDrawerOpen()) {
+      drawer.hidden = true;
+      document.body.classList.remove("jars-open");
+      return;
+    }
+    if (closingDrawer) return;
+
+    closingDrawer = true;
+    drawer.classList.remove("is-open");
+
+    const finish = () => {
+      drawer.hidden = true;
+      document.body.classList.remove("jars-open");
+      closingDrawer = false;
+    };
+
+    if (reducedMotion()) {
+      finish();
+      return;
+    }
+
+    setTimeout(finish, 320);
   }
 
   function openFormDialog(kind) {
@@ -938,6 +995,9 @@
     $("app").classList.toggle("is-home", home);
     $("home-actions").hidden = !home;
 
+    // The jar shelf is reachable from the home page for now.
+    $("jars-fab-button").hidden = !home;
+
     for (const id of [
       "back-button",
       "jar-heading",
@@ -987,6 +1047,8 @@
     document.querySelectorAll("dialog[open]").forEach(dialog => {
       void closeDialog(dialog, true);
     });
+
+    closeJarsDrawer();
 
     setStatus("");
 
@@ -1320,6 +1382,20 @@
 
   $("back-button").addEventListener("click", () => {
     navigate();
+  });
+
+  $("jars-fab-button").addEventListener("click", () => {
+    openJarsDrawer();
+  });
+
+  document.querySelectorAll("[data-close-jars]").forEach(element => {
+    element.addEventListener("click", closeJarsDrawer);
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && isDrawerOpen()) {
+      closeJarsDrawer();
+    }
   });
 
   $("copy-button").addEventListener("click", () => {

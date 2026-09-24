@@ -64,6 +64,10 @@ body.modal-open {
   overflow: hidden;
 }
 
+body.jars-open {
+  overflow: hidden;
+}
+
 button,
 input,
 textarea {
@@ -632,6 +636,160 @@ p {
   to { opacity: 0; }
 }
 
+/* My Jars floating button */
+
+.jars-fab {
+  position: fixed;
+  left: max(24px, env(safe-area-inset-left));
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 54px;
+  padding: 14px 22px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(#FFF3D6, var(--soft-gold));
+  box-shadow:
+    0 4px 0 #E4C37F,
+    0 10px 22px #C9A45C33;
+  color: #7D5F2B;
+  font: 500 1.02rem var(--font-display);
+  cursor: pointer;
+  transition: transform 180ms var(--ease-out);
+}
+
+@media (hover: hover) {
+  .jars-fab:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.jars-fab:active {
+  transform: translateY(2px);
+}
+
+/* My Jars shelf drawer */
+
+.jars-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+
+.jars-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #61475855;
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+
+.jars-drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(440px, 100vw);
+  padding: 26px 26px 30px;
+  overflow: hidden;
+  border-left: 2px solid #FFFFFFE0;
+  border-radius: var(--radius-large) 0 0 var(--radius-large);
+  background:
+    linear-gradient(
+      165deg,
+      var(--soft-white) 0%,
+      #FFEAF4 55%,
+      var(--lavender) 100%
+    );
+  box-shadow: -18px 0 48px #61475840;
+  transform: translateX(105%);
+  transition: transform 320ms var(--ease-out);
+}
+
+.jars-drawer.is-open .jars-drawer-backdrop {
+  opacity: 1;
+}
+
+.jars-drawer.is-open .jars-drawer-panel {
+  transform: translateX(0);
+}
+
+.jars-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.jars-drawer-title {
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+.jars-drawer-close {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 2px solid #FFFFFFD9;
+  border-radius: 50%;
+  background: var(--pastel-pink);
+  color: var(--deep-pink);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition:
+    transform 200ms var(--ease-out),
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+@media (hover: hover) {
+  .jars-drawer-close:hover {
+    background: var(--candy-pink);
+    color: var(--soft-white);
+    transform: rotate(90deg) scale(1.08);
+  }
+}
+
+.jars-drawer-close:active {
+  transform: scale(.9);
+}
+
+.jars-drawer-content {
+  flex: 1;
+  margin-top: 18px;
+  overflow-y: auto;
+}
+
+.jars-drawer-sparkle {
+  position: absolute;
+  left: 24px;
+  bottom: 26px;
+  color: #D77EA5;
+  font-size: 20px;
+  opacity: .35;
+  pointer-events: none;
+  animation: decoration-float 9s ease-in-out infinite;
+}
+
+.jars-drawer-sparkle-second {
+  top: 88px;
+  right: 34px;
+  bottom: auto;
+  left: auto;
+  color: #BE942F;
+  font-size: 17px;
+  animation-duration: 11s;
+  animation-delay: -4s;
+}
+
 /* Responsive */
 
 @media (max-width: 480px) {
@@ -663,6 +821,18 @@ p {
     bottom: calc(18px + env(safe-area-inset-bottom));
     max-width: calc(100vw - 32px);
     font-size: 1rem;
+  }
+
+  .jars-fab {
+    left: 16px;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    font-size: .97rem;
+  }
+
+  .jars-drawer-panel {
+    width: 100vw;
+    padding: 22px 20px 26px;
+    border-radius: 0;
   }
 
   .modal {
