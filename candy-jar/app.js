@@ -150,7 +150,6 @@
     const browserToken = localStorage.getItem(OWNER_TOKEN_KEY);
     return Boolean(jar && browserToken && jar.ownerToken === browserToken);
   }
-
   function makeCandyId() {
     if (typeof crypto.randomUUID === "function") {
       return crypto.randomUUID();
