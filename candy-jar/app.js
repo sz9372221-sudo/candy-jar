@@ -6,6 +6,7 @@
      ======================================================== */
 
   const STORE_KEY = "kindJars.v1";
+  const OWNER_TOKEN_KEY = "kindJars.ownerToken.v1";
   const CAPACITY = 50;
   const MESSAGE_LIMIT = 150;
   const SVG_NS = "http://www.w3.org/2000/svg";
@@ -132,6 +133,22 @@
       crypto.getRandomValues(new Uint8Array(32)),
       value => value.toString(16).padStart(2, "0")
     ).join("");
+  }
+
+  function getBrowserOwnerToken() {
+    let token = localStorage.getItem(OWNER_TOKEN_KEY);
+
+    if (!token) {
+      token = makeOwnerToken();
+      localStorage.setItem(OWNER_TOKEN_KEY, token);
+    }
+
+    return token;
+  }
+
+  function isJarOwner(jar) {
+    const browserToken = localStorage.getItem(OWNER_TOKEN_KEY);
+    return Boolean(jar && browserToken && jar.ownerToken === browserToken);
   }
 
   function makeCandyId() {
@@ -1174,6 +1191,93 @@
         : "🍬 Add a Candy";
   }
 
+  function openEditDialog() {
+    if (!activeCode) return;
+
+    try {
+      if (!isJarOwner(getJar(readStore(), activeCode))) return;
+    } catch (error) {
+      console.error("Could not read jar owner:", error);
+      return;
+    }
+
+    clearError("edit-error");
+    $("edit-name-input").value = $("jar-title").textContent;
+    showDialog($("edit-dialog"));
+  }
+
+  function openDeleteDialog() {
+    if (!activeCode) return;
+
+    try {
+      if (!isJarOwner(getJar(readStore(), activeCode))) return;
+    } catch (error) {
+      console.error("Could not read jar owner:", error);
+      return;
+    }
+
+    showDialog($("delete-dialog"));
+  }
+
+  async function editJar() {
+    clearError("edit-error");
+
+    const code = activeCode;
+    const name = $("edit-name-input").value.trim();
+
+    if (!code || !name) {
+      showError("edit-error", "Give your jar a little name first 🎀");
+      $("edit-name-input").focus();
+      return;
+    }
+
+    try {
+      const data = readStore();
+      const jar = getJar(data, code);
+
+      if (!jar || !isJarOwner(jar)) {
+        showError("edit-error", "Only the jar owner can rename this jar 💗");
+        return;
+      }
+
+      jar.name = name.slice(0, 24);
+      writeStore(data);
+      await closeDialog($("edit-dialog"));
+      renderPage(jar, code);
+      setStatus("Your jar has a fresh little name ✨");
+    } catch (error) {
+      console.error("Could not edit jar:", error);
+      showError("edit-error", "We couldn't save that name. Please try again 🍭");
+    }
+  }
+
+  async function deleteJar() {
+    const code = activeCode;
+    const version = routeVersion;
+
+    if (!code) return;
+
+    try {
+      const data = readStore();
+      const jar = getJar(data, code);
+
+      if (!jar || !isJarOwner(jar)) {
+        await closeDialog($("delete-dialog"));
+        setStatus("Only the jar owner can delete this jar 💗");
+        return;
+      }
+
+      delete data[code];
+      writeStore(data);
+      await closeDialog($("delete-dialog"));
+
+      if (version === routeVersion) navigate();
+    } catch (error) {
+      console.error("Could not delete jar:", error);
+      setStatus("We couldn't delete this jar. Please try again 🍭");
+    }
+  }
+
   function renderPage(jar, code) {
     activeCode = jar ? code : null;
 
@@ -1198,6 +1302,7 @@
     }
 
     $("jar-title").textContent = jar?.name || "My Jar";
+    $("jar-owner-actions").hidden = !isJarOwner(jar);
     $("jar-code").textContent = code || "";
     $("candy-count").textContent = records.length;
 
@@ -1309,7 +1414,7 @@
         name: name.slice(0, 24),
         candies: [],
         capacity: CAPACITY,
-        ownerToken: makeOwnerToken(),
+        ownerToken: getBrowserOwnerToken(),
         createdAt: Date.now()
       };
 
@@ -1570,6 +1675,10 @@
     openFormDialog("add");
   });
 
+  $("edit-jar-button").addEventListener("click", openEditDialog);
+
+  $("delete-jar-button").addEventListener("click", openDeleteDialog);
+
   $("back-button").addEventListener("click", () => {
     navigate();
   });
@@ -1627,6 +1736,10 @@
     clearError("create-error");
   });
 
+  $("edit-name-input").addEventListener("input", () => {
+    clearError("edit-error");
+  });
+
   $("join-code-input").addEventListener("input", () => {
     const input = $("join-code-input");
     input.value = input.value.toUpperCase().replace(/\s/g, "");
@@ -1643,6 +1756,8 @@
   bindSubmit("create-form", createJar);
   bindSubmit("join-form", joinJar);
   bindSubmit("add-form", addCandy);
+  bindSubmit("edit-form", editJar);
+  bindSubmit("delete-form", deleteJar);
 
   window.addEventListener("hashchange", renderRoute);
 
