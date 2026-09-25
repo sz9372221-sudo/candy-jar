@@ -127,6 +127,13 @@
     throw new Error("Could not generate an available jar code");
   }
 
+  function makeOwnerToken() {
+    return Array.from(
+      crypto.getRandomValues(new Uint8Array(32)),
+      value => value.toString(16).padStart(2, "0")
+    ).join("");
+  }
+
   function makeCandyId() {
     if (typeof crypto.randomUUID === "function") {
       return crypto.randomUUID();
@@ -1302,6 +1309,7 @@
         name: name.slice(0, 24),
         candies: [],
         capacity: CAPACITY,
+        ownerToken: makeOwnerToken(),
         createdAt: Date.now()
       };
 
