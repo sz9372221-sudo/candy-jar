@@ -189,6 +189,57 @@ p {
   max-width: 580px;
 }
 
+.jar-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.jar-title-row h1 {
+  min-width: 0;
+}
+
+.jar-owner-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.jar-owner-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid #FFFFFFD9;
+  border-radius: var(--radius-pill);
+  background: var(--pastel-pink);
+  box-shadow: 0 3px 0 #D88AAA;
+  color: var(--deep-pink);
+  font: 600 .76rem/1 var(--font-display);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform 180ms var(--ease-out),
+    box-shadow 180ms ease;
+}
+
+@media (hover: hover) {
+  .jar-owner-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #DD87AF;
+  }
+}
+
+.jar-owner-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #D88AAA;
+}
+
 .eyebrow {
   font-size: .72rem;
   font-weight: 700;
