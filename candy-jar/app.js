@@ -20,42 +20,12 @@
     "#FFE29A"
   ];
 
-  const SAMPLE_JARS = [
-    {
-      name: "Strawberry Dreams",
-      count: 12,
-      accent: "#FF9EC4",
-      wash: "#FFF0F6",
-      shelf: "#FFD6E8"
-    },
-    {
-      name: "Lemon Sunshine",
-      count: 38,
-      accent: "#F3C95E",
-      wash: "#FFF9DC",
-      shelf: "#FFEEC2"
-    },
-    {
-      name: "Minty Breeze",
-      count: 27,
-      accent: "#89CDB3",
-      wash: "#ECFAF4",
-      shelf: "#CFEFE2"
-    },
-    {
-      name: "Chocolate Hug",
-      count: 44,
-      accent: "#BC846B",
-      wash: "#F8EEE9",
-      shelf: "#E8CFC1"
-    },
-    {
-      name: "Blueberry Sky",
-      count: 8,
-      accent: "#91AEE8",
-      wash: "#EFF5FF",
-      shelf: "#D7E4FA"
-    }
+  const JAR_CARD_THEMES = [
+    { accent: "#FF9EC4", wash: "#FFF0F6", shelf: "#FFD6E8" },
+    { accent: "#F3C95E", wash: "#FFF9DC", shelf: "#FFEEC2" },
+    { accent: "#89CDB3", wash: "#ECFAF4", shelf: "#CFEFE2" },
+    { accent: "#BC846B", wash: "#F8EEE9", shelf: "#E8CFC1" },
+    { accent: "#91AEE8", wash: "#EFF5FF", shelf: "#D7E4FA" }
   ];
 
   const $ = id => document.getElementById(id);
@@ -401,45 +371,95 @@
     return svg;
   }
 
+  function getShelfJars() {
+    try {
+      const data = readStore();
+
+      return Object.keys(data).reduce((jars, code) => {
+        const jar = getJar(data, code);
+
+        if (jar) jars.push({ code, ...jar });
+        return jars;
+      }, []);
+    } catch (error) {
+      console.error("Could not read jars for the shelf:", error);
+      return [];
+    }
+  }
+
+  function getJarCardTheme(code) {
+    return JAR_CARD_THEMES[hashString(code) % JAR_CARD_THEMES.length];
+  }
+
   function renderJarsShelf() {
     const content = $("jars-drawer-content");
-    const shelf = document.createElement("div");
+    const jars = getShelfJars();
     const intro = document.createElement("p");
 
     content.replaceChildren();
     intro.className = "shelf-intro";
-    intro.textContent = "A little sample shelf, made with sweet intentions.";
+    intro.textContent = jars.length
+      ? "Every jar you make or open, all in one sweet little shelf."
+      : "Your shelf is ready for something lovely.";
+
+    content.append(intro);
+
+    if (!jars.length) {
+      const emptyState = document.createElement("div");
+      const illustration = document.createElement("div");
+      const message = document.createElement("p");
+
+      emptyState.className = "jars-empty-state";
+      illustration.className = "jars-empty-illustration";
+      illustration.setAttribute("aria-hidden", "true");
+      illustration.textContent = "🍭";
+      message.textContent = "No jars yet! Create your first one 🍭";
+      emptyState.append(illustration, message);
+      content.append(emptyState);
+      return;
+    }
+
+    const shelf = document.createElement("div");
     shelf.className = "jar-shelf";
-    shelf.setAttribute("role", "list");
-    shelf.setAttribute("aria-label", "Sample candy jars");
 
-    SAMPLE_JARS.forEach((jar, index) => {
-      const card = document.createElement("article");
+    jars.forEach(({ code, ...jar }, index) => {
+      const theme = getJarCardTheme(code);
+      const card = document.createElement("button");
       const icon = document.createElement("div");
-      const name = document.createElement("h3");
-      const count = document.createElement("p");
+      const name = document.createElement("span");
+      const count = document.createElement("span");
+      const records = getCandyRecords(jar);
 
+      card.type = "button";
       card.className = "jar-shelf-card";
-      card.style.setProperty("--jar-accent", jar.accent);
-      card.style.setProperty("--jar-wash", jar.wash);
-      card.style.setProperty("--shelf-color", jar.shelf);
+      card.style.setProperty("--jar-accent", theme.accent);
+      card.style.setProperty("--jar-wash", theme.wash);
+      card.style.setProperty("--shelf-color", theme.shelf);
       card.style.setProperty("--card-delay", `${index * 45}ms`);
-      card.setAttribute("role", "listitem");
+      card.setAttribute(
+        "aria-label",
+        `Open ${jar.name}, ${records.length} of ${CAPACITY} candies`
+      );
 
       icon.className = "jar-card-icon";
-      icon.append(createMiniJarIcon(jar));
+      icon.append(createMiniJarIcon({ ...jar, ...theme }));
 
       name.className = "jar-card-name";
       name.textContent = jar.name;
 
       count.className = "jar-card-count";
-      count.textContent = `${jar.count}/${CAPACITY} 🍬`;
+      count.textContent = `${records.length}/${CAPACITY} 🍬`;
+
+      card.addEventListener("click", () => {
+        closeJarsDrawer(true);
+        navigate(code);
+      });
 
       card.append(icon, name, count);
       shelf.append(card);
     });
 
-    content.append(intro, shelf);
+    content.append(shelf);
   }
 
   function isDrawerOpen() {
@@ -468,7 +488,7 @@
     }
   }
 
-  function closeJarsDrawer() {
+  function closeJarsDrawer(immediate = false) {
     const drawer = $("jars-drawer");
 
     if (!isDrawerOpen()) {
@@ -476,7 +496,7 @@
       document.body.classList.remove("jars-open");
       return;
     }
-    if (closingDrawer) return;
+    if (closingDrawer && !immediate) return;
 
     closingDrawer = true;
     drawer.classList.remove("is-open");
@@ -487,7 +507,7 @@
       closingDrawer = false;
     };
 
-    if (reducedMotion()) {
+    if (immediate || reducedMotion()) {
       finish();
       return;
     }

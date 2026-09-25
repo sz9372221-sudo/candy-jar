@@ -778,6 +778,69 @@ p {
   text-align: left;
 }
 
+.jars-empty-state {
+  display: grid;
+  min-height: 310px;
+  place-items: center;
+  align-content: center;
+  gap: 16px;
+  padding: 38px 18px 58px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.jars-empty-state p {
+  max-width: 250px;
+  font: 500 1rem/1.5 var(--font-display);
+}
+
+.jars-empty-illustration {
+  position: relative;
+  display: grid;
+  width: 92px;
+  height: 92px;
+  place-items: center;
+  border: 2px solid #FFFFFFD9;
+  border-radius: 50%;
+  background: radial-gradient(circle, #FFFDFB 20%, #FFD6E8 100%);
+  box-shadow:
+    0 13px 28px #82609320,
+    inset 0 0 0 5px #FFFFFF80;
+  font-size: 3rem;
+  animation: empty-jar-float 3.4s ease-in-out infinite;
+}
+
+.jars-empty-illustration::before,
+.jars-empty-illustration::after {
+  position: absolute;
+  color: #D89A32;
+  font: 1.3rem var(--font-display);
+}
+
+.jars-empty-illustration::before {
+  top: -8px;
+  right: -18px;
+  content: "✦";
+}
+
+.jars-empty-illustration::after {
+  bottom: -4px;
+  left: -24px;
+  color: #D77EA5;
+  content: "♥";
+}
+
+@keyframes empty-jar-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateY(-6px) rotate(2deg);
+  }
+}
+
 .jar-shelf {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -793,6 +856,7 @@ p {
 
   position: relative;
   display: flex;
+  width: 100%;
   min-width: 0;
   min-height: 178px;
   flex-direction: column;
@@ -811,7 +875,10 @@ p {
   box-shadow:
     0 13px 25px #8260931C,
     inset 0 0 0 1px #FFFFFF99;
+  color: var(--ink);
   text-align: center;
+  cursor: pointer;
+  appearance: none;
   animation: shelf-card-in 360ms var(--ease-out) both;
   animation-delay: var(--card-delay);
   transition:
@@ -903,6 +970,15 @@ p {
   .jar-shelf-card:hover .mini-jar-icon {
     transform: translateY(-3px) rotate(-2deg) scale(1.045);
   }
+}
+
+.jar-shelf-card:focus-visible {
+  outline: 3px solid #8F5C78;
+  outline-offset: 4px;
+}
+
+.jar-shelf-card:active {
+  transform: translateY(1px) scale(.99);
 }
 
 @keyframes shelf-card-in {
