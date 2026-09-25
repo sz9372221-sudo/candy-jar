@@ -765,7 +765,156 @@ p {
 .jars-drawer-content {
   flex: 1;
   margin-top: 18px;
+  padding: 2px 5px 34px 2px;
   overflow-y: auto;
+}
+
+.shelf-intro {
+  max-width: 290px;
+  margin-bottom: 25px;
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.jar-shelf {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px 20px;
+  align-items: end;
+}
+
+.jar-shelf-card {
+  --jar-accent: var(--candy-pink);
+  --jar-wash: #FFF0F6;
+  --shelf-color: var(--pastel-pink);
+  --card-delay: 0ms;
+
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 178px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 13px 10px 12px;
+  border: 1px solid #FFFFFFE6;
+  border-radius: 25px;
+  background:
+    radial-gradient(
+      circle at 50% 32%,
+      #FFFFFFF2 0%,
+      var(--jar-wash) 58%,
+      #FFFFFF70 100%
+    );
+  box-shadow:
+    0 13px 25px #8260931C,
+    inset 0 0 0 1px #FFFFFF99;
+  text-align: center;
+  animation: shelf-card-in 360ms var(--ease-out) both;
+  animation-delay: var(--card-delay);
+  transition:
+    transform 220ms var(--ease-out),
+    box-shadow 220ms ease;
+}
+
+/* Each pastel rail makes the card feel like it is resting on a shelf. */
+.jar-shelf-card::after {
+  position: absolute;
+  right: -9px;
+  bottom: -12px;
+  left: -9px;
+  height: 12px;
+  border: 1px solid #FFFFFFCC;
+  border-radius: 8px;
+  background: var(--shelf-color);
+  box-shadow:
+    0 6px 8px #82609324,
+    inset 0 2px 0 #FFFFFF9E;
+  content: "";
+  transition:
+    right 220ms var(--ease-out),
+    left 220ms var(--ease-out),
+    box-shadow 220ms ease;
+}
+
+.jar-shelf-card:last-child:nth-child(odd) {
+  width: calc(50% - 10px);
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+.jar-card-icon {
+  position: relative;
+  display: grid;
+  width: 82px;
+  height: 100px;
+  place-items: center;
+  margin-bottom: 1px;
+}
+
+.mini-jar-icon {
+  display: block;
+  width: 78px;
+  height: 88px;
+  overflow: visible;
+  filter: drop-shadow(0 8px 5px #8260932B);
+  transform-origin: 50% 100%;
+  transition: transform 240ms var(--ease-out);
+}
+
+.jar-card-name {
+  max-width: 100%;
+  margin-top: 7px;
+  overflow: hidden;
+  color: var(--ink);
+  font: 500 .92rem/1.2 var(--font-display);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jar-card-count {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .jar-shelf-card:hover {
+    z-index: 2;
+    transform: translateY(-5px);
+    box-shadow:
+      0 17px 30px #82609329,
+      inset 0 0 0 1px #FFFFFFCC;
+  }
+
+  .jar-shelf-card:hover::after {
+    right: -12px;
+    left: -12px;
+    box-shadow:
+      0 8px 11px #82609330,
+      inset 0 2px 0 #FFFFFFB8;
+  }
+
+  .jar-shelf-card:hover .mini-jar-icon {
+    transform: translateY(-3px) rotate(-2deg) scale(1.045);
+  }
+}
+
+@keyframes shelf-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px) scale(.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .jars-drawer-sparkle {

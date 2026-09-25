@@ -20,6 +20,44 @@
     "#FFE29A"
   ];
 
+  const SAMPLE_JARS = [
+    {
+      name: "Strawberry Dreams",
+      count: 12,
+      accent: "#FF9EC4",
+      wash: "#FFF0F6",
+      shelf: "#FFD6E8"
+    },
+    {
+      name: "Lemon Sunshine",
+      count: 38,
+      accent: "#F3C95E",
+      wash: "#FFF9DC",
+      shelf: "#FFEEC2"
+    },
+    {
+      name: "Minty Breeze",
+      count: 27,
+      accent: "#89CDB3",
+      wash: "#ECFAF4",
+      shelf: "#CFEFE2"
+    },
+    {
+      name: "Chocolate Hug",
+      count: 44,
+      accent: "#BC846B",
+      wash: "#F8EEE9",
+      shelf: "#E8CFC1"
+    },
+    {
+      name: "Blueberry Sky",
+      count: 8,
+      accent: "#91AEE8",
+      wash: "#EFF5FF",
+      shelf: "#D7E4FA"
+    }
+  ];
+
   const $ = id => document.getElementById(id);
 
   let activeCode = null;
@@ -281,6 +319,129 @@
      My Jars shelf drawer
      ======================================================== */
 
+  function createMiniJarIcon(jar) {
+    const svg = svgElement("svg", {
+      class: "mini-jar-icon",
+      viewBox: "0 0 90 100",
+      xmlns: SVG_NS,
+      role: "img",
+      "aria-label": `Cute candy jar for ${jar.name}`
+    });
+
+    const title = svgElement("title");
+    title.textContent = `${jar.name} candy jar`;
+    svg.append(title);
+
+    const bodyPath =
+      "M28 29H62V35C62 40 73 43 73 53V81Q73 90 64 90H26Q17 90 17 81V53C17 43 28 40 28 35Z";
+
+    svg.append(
+      svgElement("path", {
+        d: bodyPath,
+        fill: jar.wash,
+        stroke: "#C994AD",
+        "stroke-width": 2
+      }),
+      svgElement("path", {
+        d: bodyPath,
+        fill: jar.accent,
+        stroke: "#C994AD",
+        "stroke-width": 2,
+        opacity: .48
+      }),
+      svgElement("path", {
+        d: "M25 44Q20 49 20 57V75",
+        fill: "none",
+        stroke: "#FFFFFF",
+        "stroke-width": 4,
+        "stroke-linecap": "round",
+        opacity: .86
+      }),
+      svgElement("path", {
+        d: "M45 55C38 49 29 57 45 72C61 57 52 49 45 55Z",
+        fill: "#FFFFFF",
+        opacity: .88
+      }),
+      svgElement("rect", {
+        x: 25,
+        y: 22,
+        width: 40,
+        height: 12,
+        rx: 5,
+        fill: jar.accent,
+        stroke: "#C994AD",
+        "stroke-width": 1.5
+      }),
+      svgElement("rect", {
+        x: 29,
+        y: 17,
+        width: 32,
+        height: 7,
+        rx: 3.5,
+        fill: "#FFFDFB",
+        stroke: "#C994AD",
+        "stroke-width": 1.5
+      }),
+      svgElement("path", {
+        d: "M43 17C38 8 28 10 31 16C33 20 39 19 43 17ZM47 17C52 8 62 10 59 16C57 20 51 19 47 17Z",
+        fill: jar.accent,
+        stroke: "#C994AD",
+        "stroke-width": 1.3
+      }),
+      svgElement("circle", {
+        cx: 45,
+        cy: 16,
+        r: 3.5,
+        fill: jar.wash,
+        stroke: "#C994AD",
+        "stroke-width": 1.2
+      })
+    );
+
+    return svg;
+  }
+
+  function renderJarsShelf() {
+    const content = $("jars-drawer-content");
+    const shelf = document.createElement("div");
+    const intro = document.createElement("p");
+
+    content.replaceChildren();
+    intro.className = "shelf-intro";
+    intro.textContent = "A little sample shelf, made with sweet intentions.";
+    shelf.className = "jar-shelf";
+    shelf.setAttribute("role", "list");
+    shelf.setAttribute("aria-label", "Sample candy jars");
+
+    SAMPLE_JARS.forEach((jar, index) => {
+      const card = document.createElement("article");
+      const icon = document.createElement("div");
+      const name = document.createElement("h3");
+      const count = document.createElement("p");
+
+      card.className = "jar-shelf-card";
+      card.style.setProperty("--jar-accent", jar.accent);
+      card.style.setProperty("--jar-wash", jar.wash);
+      card.style.setProperty("--shelf-color", jar.shelf);
+      card.style.setProperty("--card-delay", `${index * 45}ms`);
+      card.setAttribute("role", "listitem");
+
+      icon.className = "jar-card-icon";
+      icon.append(createMiniJarIcon(jar));
+
+      name.className = "jar-card-name";
+      name.textContent = jar.name;
+
+      count.className = "jar-card-count";
+      count.textContent = `${jar.count}/${CAPACITY} 🍬`;
+
+      card.append(icon, name, count);
+      shelf.append(card);
+    });
+
+    content.append(intro, shelf);
+  }
+
   function isDrawerOpen() {
     return $("jars-drawer").classList.contains("is-open");
   }
@@ -290,6 +451,7 @@
 
     if (isDrawerOpen()) return;
 
+    renderJarsShelf();
     drawer.hidden = false;
     // Let the browser paint the hidden→visible state before
     // transitioning, so the slide-in animation plays.
