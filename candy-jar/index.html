@@ -43,7 +43,31 @@
 
     <header id="jar-heading" class="jar-heading" hidden>
       <p class="eyebrow">A little home for kindness</p>
-      <h1 id="jar-title" tabindex="-1">My Jar</h1>
+      <div class="jar-title-row">
+        <h1 id="jar-title" tabindex="-1">My Jar</h1>
+        <div id="jar-owner-actions" class="jar-owner-actions" hidden>
+          <button
+            id="edit-jar-button"
+            class="jar-owner-button"
+            type="button"
+            aria-label="Edit jar name"
+            aria-haspopup="dialog"
+            aria-controls="edit-dialog"
+          >
+            ✏️ Edit
+          </button>
+          <button
+            id="delete-jar-button"
+            class="jar-owner-button jar-owner-button-delete"
+            type="button"
+            aria-label="Delete jar"
+            aria-haspopup="dialog"
+            aria-controls="delete-dialog"
+          >
+            🗑️ Delete
+          </button>
+        </div>
+      </div>
       <p class="subtitle">
         Every kind word is something sweet to keep.
       </p>
@@ -394,6 +418,77 @@
 
       <button class="button button-pink submit-button" type="submit">
         ✨ Create My Jar
+      </button>
+    </form>
+  </dialog>
+
+  <!-- Edit jar -->
+  <dialog
+    id="edit-dialog"
+    class="modal"
+    aria-labelledby="edit-title"
+    aria-describedby="edit-description"
+  >
+    <button
+      class="modal-close"
+      type="button"
+      aria-label="Close"
+      data-close
+    >✕</button>
+
+    <div class="modal-icon" aria-hidden="true">✏️</div>
+    <h2 id="edit-title">Rename Your Jar</h2>
+    <p id="edit-description" class="modal-description">
+      Give your little jar a new name.
+    </p>
+
+    <form id="edit-form">
+      <label for="edit-name-input">Jar name</label>
+      <input
+        id="edit-name-input"
+        name="name"
+        type="text"
+        maxlength="24"
+        placeholder="Kindness Corner"
+        autocomplete="off"
+        required
+        autofocus
+      >
+
+      <p id="edit-error" class="form-error" role="alert" hidden></p>
+
+      <button class="button button-pink submit-button" type="submit">
+        ✨ Save Name
+      </button>
+    </form>
+  </dialog>
+
+  <!-- Delete jar -->
+  <dialog
+    id="delete-dialog"
+    class="modal"
+    aria-labelledby="delete-title"
+    aria-describedby="delete-description"
+  >
+    <button
+      class="modal-close"
+      type="button"
+      aria-label="Close"
+      data-close
+    >✕</button>
+
+    <div class="modal-icon" aria-hidden="true">🗑️</div>
+    <h2 id="delete-title">Delete This Jar?</h2>
+    <p id="delete-description" class="modal-description">
+      This will remove the jar and its little kindness notes.
+    </p>
+
+    <form id="delete-form">
+      <button class="button button-pink submit-button" type="submit">
+        🗑️ Delete Jar
+      </button>
+      <button class="button button-lavender submit-button" type="button" data-close>
+        Keep It
       </button>
     </form>
   </dialog>
