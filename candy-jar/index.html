@@ -577,26 +577,104 @@
     </p>
 
     <form id="add-form">
-      <label for="message-input">Your kind message</label>
-      <textarea
-        id="message-input"
-        name="message"
-        rows="4"
-        maxlength="150"
-        placeholder="You make the world a little brighter…"
-        aria-describedby="message-count"
-        required
-        autofocus
-      ></textarea>
+      <fieldset class="candy-type-fieldset">
+        <legend class="candy-type-legend">What kind of candy?</legend>
 
-      <div class="message-meta">
-        <span>A little kindness goes a long way ♡</span>
-        <span id="message-count">0 / 150</span>
+        <div class="candy-type-tabs">
+          <input
+            class="candy-type-radio"
+            type="radio"
+            name="candyType"
+            id="candy-type-text"
+            value="text"
+            checked
+          >
+          <label for="candy-type-text" class="candy-type-tab">
+            <span aria-hidden="true">💬</span> Text
+          </label>
+
+          <input
+            class="candy-type-radio"
+            type="radio"
+            name="candyType"
+            id="candy-type-photo"
+            value="photo"
+          >
+          <label for="candy-type-photo" class="candy-type-tab">
+            <span aria-hidden="true">📷</span> Photo
+          </label>
+
+          <input
+            class="candy-type-radio"
+            type="radio"
+            name="candyType"
+            id="candy-type-song"
+            value="song"
+          >
+          <label for="candy-type-song" class="candy-type-tab">
+            <span aria-hidden="true">🎵</span> Song
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="candy-type-panel" data-candy-panel="text">
+        <label for="message-input">Your kind message</label>
+        <textarea
+          id="message-input"
+          name="message"
+          rows="4"
+          maxlength="150"
+          placeholder="You make the world a little brighter…"
+          aria-describedby="message-count"
+          required
+          autofocus
+        ></textarea>
+
+        <div class="message-meta">
+          <span>A little kindness goes a long way ♡</span>
+          <span id="message-count">0 / 150</span>
+        </div>
+      </div>
+
+      <div class="candy-type-panel" data-candy-panel="photo" hidden>
+        <p class="candy-upload-label">A photo worth sharing</p>
+        <div class="candy-upload" aria-disabled="true">
+          <span class="candy-upload-art" aria-hidden="true">📷</span>
+          <span>Tap to choose a picture</span>
+          <input
+            class="candy-upload-input"
+            id="candy-photo-input"
+            type="file"
+            accept="image/*"
+            disabled
+          >
+        </div>
+        <p class="coming-soon">Coming soon 🍬</p>
+      </div>
+
+      <div class="candy-type-panel" data-candy-panel="song" hidden>
+        <p class="candy-upload-label">A song to share</p>
+        <div class="candy-upload" aria-disabled="true">
+          <span class="candy-upload-art" aria-hidden="true">🎵</span>
+          <span>Tap to choose an audio file</span>
+          <input
+            class="candy-upload-input"
+            id="candy-song-input"
+            type="file"
+            accept="audio/*"
+            disabled
+          >
+        </div>
+        <p class="coming-soon">Coming soon 🍬</p>
       </div>
 
       <p id="add-error" class="form-error" role="alert" hidden></p>
 
-      <button class="button button-pink submit-button" type="submit">
+      <button
+        class="button button-pink submit-button"
+        id="add-submit"
+        type="submit"
+      >
         Add to Jar
       </button>
     </form>

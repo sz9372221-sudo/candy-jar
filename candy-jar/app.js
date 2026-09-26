@@ -30,6 +30,11 @@
     { accent: "#91AEE8", wash: "#EFF5FF", shelf: "#D7E4FA" }
   ];
 
+  // One candy carries one kind of content. Only "text" is wired up
+  // for now; the others are placeholders until uploads are supported.
+  const CANDY_TYPES = ["text", "photo", "song"];
+  const LIVE_CANDY_TYPES = ["text"];
+
   const $ = id => document.getElementById(id);
 
   let activeCode = null;
@@ -550,9 +555,32 @@
 
     if (kind === "add") {
       $("message-count").textContent = `0 / ${MESSAGE_LIMIT}`;
+
+      // A reset also clears the type radios, so resync the panels.
+      setCandyType("text");
     }
 
     showDialog($(`${kind}-dialog`));
+  }
+
+  function setCandyType(type) {
+    const chosen = CANDY_TYPES.includes(type) ? type : "text";
+    const radio = $(`candy-type-${chosen}`);
+
+    if (radio) radio.checked = true;
+
+    CANDY_TYPES.forEach(value => {
+      const panel = document.querySelector(
+        `[data-candy-panel="${value}"]`
+      );
+
+      if (panel) panel.hidden = value !== chosen;
+    });
+
+    // Kinds that are not live yet keep the submit out of reach.
+    $("add-submit").disabled = !LIVE_CANDY_TYPES.includes(chosen);
+
+    clearError("add-error");
   }
 
   function bindSubmit(formId, handler) {
@@ -1505,6 +1533,15 @@
 
     if (addingCandy || !activeCode) return;
 
+    const type = document.querySelector(
+      'input[name="candyType"]:checked'
+    )?.value;
+
+    if (!LIVE_CANDY_TYPES.includes(type)) {
+      showError("add-error", "That candy kind isn't ready yet 🍬");
+      return;
+    }
+
     const message = $("message-input").value.trim();
 
     if (!message || message.length > MESSAGE_LIMIT) {
@@ -1627,6 +1664,7 @@
 
       $("add-form").reset();
       $("message-count").textContent = `0 / ${MESSAGE_LIMIT}`;
+      setCandyType("text");
 
       // The full state disables the previous focus target.
       if (records.length === CAPACITY) {
@@ -1785,6 +1823,19 @@
       `${$("message-input").value.length} / ${MESSAGE_LIMIT}`;
 
     clearError("add-error");
+  });
+
+  document.querySelectorAll('input[name="candyType"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      if (!radio.checked) return;
+
+      setCandyType(radio.value);
+
+      // Jumping into the message keeps typing seamless on the way back.
+      if (LIVE_CANDY_TYPES.includes(radio.value)) {
+        $("message-input").focus();
+      }
+    });
   });
 
   bindSubmit("create-form", createJar);

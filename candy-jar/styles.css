@@ -662,6 +662,148 @@ p {
   font-variant-numeric: tabular-nums;
 }
 
+/* Candy type tabs (Text / Photo / Song) */
+
+.candy-type-fieldset {
+  min-inline-size: 0;
+  margin: 21px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.candy-type-legend {
+  margin: 0 0 9px;
+  padding: 0;
+  font-size: .92rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.candy-type-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
+  border: 2px solid #FFFFFFCC;
+  border-radius: var(--radius-pill);
+  background: #FFFFFF73;
+}
+
+/* The radios stay real inputs for keyboard and screen readers. */
+.modal .candy-type-radio,
+.modal .candy-upload-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.modal .candy-type-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 0;
+  padding: 10px 6px;
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+  font: 500 .9rem/1.2 var(--font-display);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms var(--ease-out);
+}
+
+@media (hover: hover) {
+  .modal .candy-type-tab:hover {
+    background: var(--pastel-pink);
+    color: var(--deep-pink);
+  }
+}
+
+.modal .candy-type-tab:active {
+  transform: scale(.95);
+}
+
+.modal .candy-type-radio:checked + .candy-type-tab {
+  background: linear-gradient(#FFB9D6, var(--candy-pink));
+  box-shadow:
+    0 3px 0 #DD87AF,
+    0 6px 14px #D793B426;
+  color: var(--soft-white);
+}
+
+.modal .candy-type-radio:focus-visible + .candy-type-tab {
+  outline: 3px solid #8F5C78;
+  outline-offset: 3px;
+}
+
+.candy-type-panel {
+  animation: candy-panel-in 240ms var(--ease-out);
+}
+
+@keyframes candy-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Placeholder upload zones for the candy types still to come */
+
+.candy-upload-label {
+  margin: 21px 0 8px;
+  font-size: .92rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.candy-upload {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 26px 16px;
+  border: 2px dashed #E0A8C2;
+  border-radius: var(--radius-medium);
+  background: #FFFFFF8F;
+  color: var(--muted);
+  font-size: .82rem;
+  text-align: center;
+}
+
+.candy-upload-art {
+  font-size: 1.9rem;
+  line-height: 1;
+  animation: empty-jar-float 3.4s ease-in-out infinite;
+}
+
+.coming-soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 6px 15px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(#FFF3D6, var(--soft-gold));
+  box-shadow: 0 3px 0 #E4C37F;
+  color: #7D5F2B;
+  font: 500 .78rem var(--font-display);
+}
+
 /* Rename jar modal */
 
 .edit-modal {
