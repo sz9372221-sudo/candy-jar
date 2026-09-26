@@ -30,6 +30,11 @@
     { accent: "#91AEE8", wash: "#EFF5FF", shelf: "#D7E4FA" }
   ];
 
+  // One candy carries one kind of content. Only "text" is wired up
+  // for now; the others are placeholders until uploads are supported.
+  const CANDY_TYPES = ["text", "photo", "song"];
+  const LIVE_CANDY_TYPES = ["text"];
+
   const $ = id => document.getElementById(id);
 
   let activeCode = null;
@@ -452,7 +457,9 @@
       const icon = document.createElement("div");
       const name = document.createElement("span");
       const count = document.createElement("span");
+      const role = document.createElement("span");
       const records = getCandyRecords(jar);
+      const isOwner = isJarOwner(jar);
 
       card.type = "button";
       card.className = "jar-shelf-card";
@@ -462,7 +469,9 @@
       card.style.setProperty("--card-delay", `${index * 45}ms`);
       card.setAttribute(
         "aria-label",
-        `Open ${jar.name}, ${records.length} of ${CAPACITY} candies`
+        `Open ${jar.name}, ${records.length} of ${CAPACITY} candies, ${
+          isOwner ? "you are the owner" : "you have joined"
+        }`
       );
 
       icon.className = "jar-card-icon";
@@ -474,12 +483,17 @@
       count.className = "jar-card-count";
       count.textContent = `${records.length}/${CAPACITY} 🍬`;
 
+      role.className = isOwner
+        ? "jar-card-role is-owner"
+        : "jar-card-role is-joined";
+      role.textContent = isOwner ? "Owner 👑" : "Joined 🍬";
+
       card.addEventListener("click", () => {
         closeJarsDrawer(true);
         navigate(code);
       });
 
-      card.append(icon, name, count);
+      card.append(icon, name, count, role);
       shelf.append(card);
     });
 
@@ -550,9 +564,32 @@
 
     if (kind === "add") {
       $("message-count").textContent = `0 / ${MESSAGE_LIMIT}`;
+
+      // A reset also clears the type radios, so resync the panels.
+      setCandyType("text");
     }
 
     showDialog($(`${kind}-dialog`));
+  }
+
+  function setCandyType(type) {
+    const chosen = CANDY_TYPES.includes(type) ? type : "text";
+    const radio = $(`candy-type-${chosen}`);
+
+    if (radio) radio.checked = true;
+
+    CANDY_TYPES.forEach(value => {
+      const panel = document.querySelector(
+        `[data-candy-panel="${value}"]`
+      );
+
+      if (panel) panel.hidden = value !== chosen;
+    });
+
+    // Kinds that are not live yet keep the submit out of reach.
+    $("add-submit").disabled = !LIVE_CANDY_TYPES.includes(chosen);
+
+    clearError("add-error");
   }
 
   function bindSubmit(formId, handler) {
@@ -1505,6 +1542,15 @@
 
     if (addingCandy || !activeCode) return;
 
+    const type = document.querySelector(
+      'input[name="candyType"]:checked'
+    )?.value;
+
+    if (!LIVE_CANDY_TYPES.includes(type)) {
+      showError("add-error", "That candy kind isn't ready yet 🍬");
+      return;
+    }
+
     const message = $("message-input").value.trim();
 
     if (!message || message.length > MESSAGE_LIMIT) {
@@ -1627,6 +1673,7 @@
 
       $("add-form").reset();
       $("message-count").textContent = `0 / ${MESSAGE_LIMIT}`;
+      setCandyType("text");
 
       // The full state disables the previous focus target.
       if (records.length === CAPACITY) {
@@ -1785,6 +1832,19 @@
       `${$("message-input").value.length} / ${MESSAGE_LIMIT}`;
 
     clearError("add-error");
+  });
+
+  document.querySelectorAll('input[name="candyType"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      if (!radio.checked) return;
+
+      setCandyType(radio.value);
+
+      // Jumping into the message keeps typing seamless on the way back.
+      if (LIVE_CANDY_TYPES.includes(radio.value)) {
+        $("message-input").focus();
+      }
+    });
   });
 
   bindSubmit("create-form", createJar);
