@@ -9,6 +9,7 @@
   const OWNER_TOKEN_KEY = "kindJars.ownerToken.v1";
   const CAPACITY = 50;
   const MESSAGE_LIMIT = 150;
+  const NAME_LIMIT = 24;
   const SVG_NS = "http://www.w3.org/2000/svg";
 
   const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -1190,19 +1191,36 @@
         : "🍬 Add a Candy";
   }
 
+  function updateNameCount() {
+    const input = $("edit-name-input");
+    $("name-count").textContent = `${input.value.length} / ${NAME_LIMIT}`;
+  }
+
   function openEditDialog() {
     if (!activeCode) return;
 
+    let jar;
+
     try {
-      if (!isJarOwner(getJar(readStore(), activeCode))) return;
+      jar = getJar(readStore(), activeCode);
+
+      if (!isJarOwner(jar)) return;
     } catch (error) {
       console.error("Could not read jar owner:", error);
       return;
     }
 
     clearError("edit-error");
-    $("edit-name-input").value = $("jar-title").textContent;
+
+    const input = $("edit-name-input");
+    input.value = jar.name.slice(0, NAME_LIMIT);
+    updateNameCount();
+
     showDialog($("edit-dialog"));
+
+    // Ready to retype the whole name straight away.
+    input.focus();
+    input.select();
   }
 
   function openDeleteDialog() {
@@ -1222,7 +1240,7 @@
     clearError("edit-error");
 
     const code = activeCode;
-    const name = $("edit-name-input").value.trim();
+    const name = $("edit-name-input").value.trim().slice(0, NAME_LIMIT);
 
     if (!code || !name) {
       showError("edit-error", "Give your jar a little name first 🎀");
@@ -1239,10 +1257,26 @@
         return;
       }
 
-      jar.name = name.slice(0, 24);
+      const previousName = jar.name;
+      jar.name = name;
       writeStore(data);
       await closeDialog($("edit-dialog"));
       renderPage(jar, code);
+
+      // The shelf re-reads storage each time it opens, so refresh it
+      // too in case it is already on screen.
+      if (isDrawerOpen()) renderJarsShelf();
+
+      if (previousName === name) {
+        setStatus("Your jar kept its lovely name 💗");
+        return;
+      }
+
+      void animateElement($("jar-title"), [
+        { opacity: .35, transform: "translateY(5px) scale(.97)" },
+        { opacity: 1, transform: "translateY(0) scale(1)" }
+      ], { duration: 320 });
+
       setStatus("Your jar has a fresh little name ✨");
     } catch (error) {
       console.error("Could not edit jar:", error);
@@ -1410,7 +1444,7 @@
       code = makeJarCode(data);
 
       data[code] = {
-        name: name.slice(0, 24),
+        name: name.slice(0, NAME_LIMIT),
         candies: [],
         capacity: CAPACITY,
         ownerToken: getBrowserOwnerToken(),
@@ -1737,6 +1771,7 @@
 
   $("edit-name-input").addEventListener("input", () => {
     clearError("edit-error");
+    updateNameCount();
   });
 
   $("join-code-input").addEventListener("input", () => {
