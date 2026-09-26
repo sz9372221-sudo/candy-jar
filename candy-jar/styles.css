@@ -1303,6 +1303,27 @@ p {
   white-space: nowrap;
 }
 
+.jar-card-role {
+  display: inline-block;
+  margin-top: 7px;
+  padding: 3px 11px;
+  border: 1px solid #FFFFFFD9;
+  border-radius: var(--radius-pill);
+  font: 500 .7rem/1.4 var(--font-display);
+  white-space: nowrap;
+}
+
+.jar-card-role.is-owner {
+  background: linear-gradient(#FFF3D6, var(--soft-gold));
+  box-shadow: inset 0 1px 0 #FFFFFFB8;
+  color: #7D5F2B;
+}
+
+.jar-card-role.is-joined {
+  background: #FFFFFFB8;
+  color: var(--muted);
+}
+
 @media (hover: hover) {
   .jar-shelf-card:hover {
     z-index: 2;

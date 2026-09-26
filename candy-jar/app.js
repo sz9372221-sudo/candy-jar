@@ -457,7 +457,9 @@
       const icon = document.createElement("div");
       const name = document.createElement("span");
       const count = document.createElement("span");
+      const role = document.createElement("span");
       const records = getCandyRecords(jar);
+      const isOwner = isJarOwner(jar);
 
       card.type = "button";
       card.className = "jar-shelf-card";
@@ -467,7 +469,9 @@
       card.style.setProperty("--card-delay", `${index * 45}ms`);
       card.setAttribute(
         "aria-label",
-        `Open ${jar.name}, ${records.length} of ${CAPACITY} candies`
+        `Open ${jar.name}, ${records.length} of ${CAPACITY} candies, ${
+          isOwner ? "you are the owner" : "you have joined"
+        }`
       );
 
       icon.className = "jar-card-icon";
@@ -479,12 +483,17 @@
       count.className = "jar-card-count";
       count.textContent = `${records.length}/${CAPACITY} 🍬`;
 
+      role.className = isOwner
+        ? "jar-card-role is-owner"
+        : "jar-card-role is-joined";
+      role.textContent = isOwner ? "Owner 👑" : "Joined 🍬";
+
       card.addEventListener("click", () => {
         closeJarsDrawer(true);
         navigate(code);
       });
 
-      card.append(icon, name, count);
+      card.append(icon, name, count, role);
       shelf.append(card);
     });
 
