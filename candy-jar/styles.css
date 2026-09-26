@@ -616,7 +616,8 @@ p {
   font-size: 1.15rem;
 }
 
-.message-meta {
+.message-meta,
+.name-meta {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -626,10 +627,65 @@ p {
   font-size: .72rem;
 }
 
-#message-count {
+.name-meta {
+  text-align: left;
+}
+
+#message-count,
+#name-count {
   margin-left: auto;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+
+/* Rename jar modal */
+
+.edit-modal {
+  border-color: var(--candy-pink);
+  background:
+    radial-gradient(
+      circle at 50% 4%,
+      #FFFFFFF2 0%,
+      var(--pastel-pink) 62%,
+      #FFE3F0 100%
+    );
+}
+
+.edit-modal .modal-icon {
+  animation: empty-jar-float 3.6s ease-in-out infinite;
+}
+
+@media (hover: hover) {
+  .edit-modal .modal-close:hover {
+    background: var(--candy-pink);
+    color: var(--soft-white);
+    transform: rotate(90deg) scale(1.08);
+  }
+}
+
+.edit-modal .modal-close:active {
+  transform: scale(.9);
+}
+
+.edit-modal-sparkle {
+  position: absolute;
+  top: 26px;
+  left: 26px;
+  color: #D77EA5;
+  font-size: 20px;
+  pointer-events: none;
+  animation: decoration-float 9s ease-in-out infinite;
+}
+
+.edit-modal-sparkle-second {
+  top: auto;
+  right: 30px;
+  bottom: 22px;
+  left: auto;
+  color: #BE942F;
+  font-size: 17px;
+  animation-duration: 11s;
+  animation-delay: -4s;
 }
 
 .submit-button {

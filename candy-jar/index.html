@@ -425,10 +425,16 @@
   <!-- Edit jar -->
   <dialog
     id="edit-dialog"
-    class="modal"
+    class="modal edit-modal"
     aria-labelledby="edit-title"
     aria-describedby="edit-description"
   >
+    <span class="edit-modal-sparkle" aria-hidden="true">✦</span>
+    <span
+      class="edit-modal-sparkle edit-modal-sparkle-second"
+      aria-hidden="true"
+    >♥</span>
+
     <button
       class="modal-close"
       type="button"
@@ -455,10 +461,15 @@
         autofocus
       >
 
+      <div class="name-meta">
+        <span>Something sweet, up to 24 letters ♡</span>
+        <span id="name-count">0 / 24</span>
+      </div>
+
       <p id="edit-error" class="form-error" role="alert" hidden></p>
 
       <button class="button button-pink submit-button" type="submit">
-        ✨ Save Name
+        💗 Save Name
       </button>
     </form>
   </dialog>
@@ -641,7 +652,7 @@
         >✕</button>
       </header>
 
-      <div class="jars-drawer-content"></div>
+      <div id="jars-drawer-content" class="jars-drawer-content"></div>
 
       <span class="jars-drawer-sparkle" aria-hidden="true">✧</span>
       <span
