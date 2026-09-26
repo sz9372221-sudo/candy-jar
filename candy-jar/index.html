@@ -477,10 +477,16 @@
   <!-- Delete jar -->
   <dialog
     id="delete-dialog"
-    class="modal"
+    class="modal delete-modal"
     aria-labelledby="delete-title"
     aria-describedby="delete-description"
   >
+    <span class="delete-modal-sparkle" aria-hidden="true">✦</span>
+    <span
+      class="delete-modal-sparkle delete-modal-sparkle-second"
+      aria-hidden="true"
+    >💧</span>
+
     <button
       class="modal-close"
       type="button"
@@ -488,18 +494,18 @@
       data-close
     >✕</button>
 
-    <div class="modal-icon" aria-hidden="true">🗑️</div>
-    <h2 id="delete-title">Delete This Jar?</h2>
+    <div class="modal-icon" aria-hidden="true">🥺</div>
+    <h2 id="delete-title">Delete this jar?</h2>
     <p id="delete-description" class="modal-description">
-      This will remove the jar and its little kindness notes.
+      Are you sure you want to delete this jar? This can't be undone 🥺
     </p>
 
-    <form id="delete-form">
-      <button class="button button-pink submit-button" type="submit">
-        🗑️ Delete Jar
+    <form id="delete-form" class="delete-actions">
+      <button class="button button-lavender" type="button" data-close>
+        Cancel
       </button>
-      <button class="button button-lavender submit-button" type="button" data-close>
-        Keep It
+      <button class="button button-danger" type="submit">
+        🗑️ Delete
       </button>
     </form>
   </dialog>

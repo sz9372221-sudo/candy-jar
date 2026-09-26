@@ -242,6 +242,22 @@ p {
   box-shadow: 0 1px 0 #D88AAA;
 }
 
+.jar-owner-button-delete {
+  background: linear-gradient(#FFF0E8, #FFD3C2);
+  box-shadow: 0 3px 0 #E8A088;
+  color: #A34A34;
+}
+
+@media (hover: hover) {
+  .jar-owner-button-delete:hover {
+    box-shadow: 0 5px 0 #E5947A;
+  }
+}
+
+.jar-owner-button-delete:active {
+  box-shadow: 0 1px 0 #E8A088;
+}
+
 .eyebrow {
   font-size: .72rem;
   font-weight: 700;
@@ -309,6 +325,14 @@ p {
   box-shadow:
     0 4px 0 #C8AFEA,
     0 10px 22px #BFA3DB20;
+}
+
+.button-danger {
+  background: linear-gradient(#FFCBB3, #F58A79);
+  box-shadow:
+    0 4px 0 #D9705F,
+    0 10px 22px #D9705F26;
+  color: var(--soft-white);
 }
 
 .button:active:not(:disabled) {
@@ -691,6 +715,84 @@ p {
 .submit-button {
   width: 100%;
   margin-top: 22px;
+}
+
+/* Delete jar confirmation */
+
+.delete-modal {
+  border-color: #F3A894;
+  background:
+    radial-gradient(
+      circle at 50% 4%,
+      #FFFFFFF2 0%,
+      #FFE9E0 62%,
+      #FFD6E8 100%
+    );
+}
+
+.delete-modal .modal-icon {
+  animation: sad-jar-wobble 2.6s ease-in-out infinite;
+}
+
+.delete-modal .modal-close {
+  background: #FFDCCF;
+  color: #A34A34;
+}
+
+@media (hover: hover) {
+  .delete-modal .modal-close:hover {
+    background: #F58A79;
+    color: var(--soft-white);
+  }
+}
+
+.delete-modal .modal-description {
+  color: #8A5240;
+}
+
+.delete-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.delete-actions .button {
+  min-height: 46px;
+  padding: 13px 16px;
+  font-size: 1rem;
+}
+
+.delete-modal-sparkle {
+  position: absolute;
+  top: 26px;
+  left: 26px;
+  color: #E29B7F;
+  font-size: 20px;
+  pointer-events: none;
+  animation: decoration-float 9s ease-in-out infinite;
+}
+
+.delete-modal-sparkle-second {
+  top: auto;
+  right: 30px;
+  bottom: 22px;
+  left: auto;
+  color: #B79BDD;
+  font-size: 17px;
+  animation-duration: 11s;
+  animation-delay: -4s;
+}
+
+@keyframes sad-jar-wobble {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+
+  50% {
+    transform: translateY(-5px) rotate(4deg);
+  }
 }
 
 .form-error {
@@ -1171,6 +1273,10 @@ p {
 
   .modal {
     padding: 36px 22px 28px;
+  }
+
+  .delete-actions {
+    grid-template-columns: 1fr;
   }
 
   .subtitle,
