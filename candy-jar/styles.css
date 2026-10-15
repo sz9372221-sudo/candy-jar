@@ -974,6 +974,28 @@ p {
   margin-top: 22px;
 }
 
+/* Editing a candy note */
+
+.note-edit-button {
+  margin-top: 18px;
+}
+
+#note-edit-form {
+  margin-top: 4px;
+  text-align: left;
+}
+
+.note-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.note-edit-actions .button {
+  flex: 1 1 auto;
+}
+
 .noscript-message {
   padding: 20px;
   text-align: center;

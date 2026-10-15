@@ -43,6 +43,7 @@
   let openingCandy = false;
   let cancelFlight = null;
   let closingDrawer = false;
+  let currentNote = null;
 
   const closingDialogs = new WeakMap();
   const dialogAnimations = new WeakMap();
@@ -1061,14 +1062,175 @@
         ? record
         : record?.message;
 
+      // Leave any previous note's edit state behind.
+      resetNoteEdit();
+
       $("note-message").textContent =
         typeof message === "string" && message.trim()
           ? message
           : "This little candy doesn't have a saved note yet ♡";
 
+      currentNote = {
+        code,
+        id: typeof record?.id === "string" ? record.id : null,
+        isEditable: canEditCandy(code, record)
+      };
+
+      $("edit-note-button").hidden = !currentNote.isEditable;
+
       showDialog($("note-dialog"));
     } finally {
       openingCandy = false;
+    }
+  }
+
+  /* ========================================================
+     Editing a candy note
+     ======================================================== */
+
+  /*
+   * One browser token guards the whole jar; it may edit any
+   * candy inside. Candies remember which browser added them,
+   * so joiners can reword their own notes too. Only candies
+   * stored one by one can be edited — the earliest format
+   * saved a plain candy count with nothing to reword.
+   */
+  function canEditCandy(code, record) {
+    const token = localStorage.getItem(OWNER_TOKEN_KEY);
+
+    if (
+      !token ||
+      !record ||
+      typeof record.id !== "string" ||
+      typeof record.message !== "string"
+    ) {
+      return false;
+    }
+
+    try {
+      const jar = getJar(readStore(), code);
+
+      if (!jar || !Array.isArray(jar.candies)) return false;
+
+      if (jar.ownerToken === token) return true;
+
+      return record.authorToken === token;
+    } catch (error) {
+      console.error("Could not read candy owner:", error);
+      return false;
+    }
+  }
+
+  function setNoteEditCount() {
+    const input = $("note-edit-input");
+    $("note-edit-count").textContent =
+      `${input.value.length} / ${MESSAGE_LIMIT}`;
+  }
+
+  function enterNoteEditMode() {
+    if (!currentNote?.isEditable || addingCandy) return;
+
+    const input = $("note-edit-input");
+
+    input.value = currentNote.message;
+    setNoteEditCount();
+    clearError("note-edit-error");
+
+    $("note-body").hidden = true;
+    $("edit-note-button").hidden = true;
+    $("note-return-button").hidden = true;
+    $("note-edit-form").hidden = false;
+
+    input.focus({ preventScroll: true });
+
+    // Put the caret at the end, ready for small tweaks.
+    input.setSelectionRange(input.value.length, input.value.length);
+  }
+
+  function exitNoteEditMode() {
+    $("note-edit-form").hidden = true;
+    $("note-body").hidden = false;
+    $("edit-note-button").hidden = !currentNote?.isEditable;
+    $("note-return-button").hidden = false;
+  }
+
+  function resetNoteEdit() {
+    currentNote = null;
+    exitNoteEditMode();
+    clearError("note-edit-error");
+  }
+
+  function cancelNoteEdit() {
+    exitNoteEditMode();
+    clearError("note-edit-error");
+    $("edit-note-button").focus({ preventScroll: true });
+  }
+
+  async function saveNoteEdit() {
+    const note = currentNote;
+
+    if (!note?.isEditable) return;
+
+    clearError("note-edit-error");
+
+    const message = $("note-edit-input").value.trim();
+
+    if (!message || message.length > MESSAGE_LIMIT) {
+      showError(
+        "note-edit-error",
+        "Write a little kindness, up to 150 characters 💗"
+      );
+      $("note-edit-input").focus();
+      return;
+    }
+
+    try {
+      const data = readStore();
+      const jar = getJar(data, note.code);
+
+      if (!jar) {
+        showError(
+          "note-edit-error",
+          "Oops! This candy is no longer available 🍭"
+        );
+        return;
+      }
+
+      const records = getCandyRecords(jar);
+      const record = records.find(
+        candy => candy.id === note.id
+      );
+
+      if (!canEditCandy(note.code, record)) {
+        showError(
+          "note-edit-error",
+          "Only the note's author can edit it 💗"
+        );
+        return;
+      }
+
+      record.message = message;
+      writeStore(data);
+
+      resetNoteEdit();
+      $("note-message").textContent = message;
+
+      void animateElement($("note-message"), [
+        { opacity: .35, transform: "translateY(4px)" },
+        { opacity: 1, transform: "translateY(0)" }
+      ], { duration: 240 });
+
+      $("note-return-button").focus({ preventScroll: true });
+      setStatus("Your note has a fresh new sparkle ✨");
+
+      // Keep the jar page aligned with the saved text.
+      if (activeCode === note.code) renderPage(jar, note.code);
+    } catch (error) {
+      console.error("Could not save note:", error);
+      showError(
+        "note-edit-error",
+        "We couldn't save that note. Please try again 🍭"
+      );
     }
   }
 
@@ -1642,6 +1804,7 @@
       records.push({
         id: makeCandyId(),
         message,
+        authorToken: getBrowserOwnerToken(),
         createdAt: Date.now()
       });
 
@@ -1781,6 +1944,18 @@
     void copyCode();
   });
 
+  $("edit-note-button").addEventListener("click", enterNoteEditMode);
+
+  $("note-edit-cancel").addEventListener("click", cancelNoteEdit);
+
+  $("note-edit-input").addEventListener("input", () => {
+    setNoteEditCount();
+    clearError("note-edit-error");
+  });
+
+  // A closed note dialog should never reopen mid-edit.
+  $("note-dialog").addEventListener("close", resetNoteEdit);
+
   document.querySelectorAll("[data-close]").forEach(button => {
     button.addEventListener("click", () => {
       void closeDialog(button.closest("dialog"));
@@ -1852,6 +2027,7 @@
   bindSubmit("add-form", addCandy);
   bindSubmit("edit-form", editJar);
   bindSubmit("delete-form", deleteJar);
+  bindSubmit("note-edit-form", saveNoteEdit);
 
   window.addEventListener("hashchange", renderRoute);
 

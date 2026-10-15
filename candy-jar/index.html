@@ -697,12 +697,58 @@
     <div class="modal-icon" aria-hidden="true">💌</div>
     <h2 id="note-title">A Sweet Little Note</h2>
 
-    <div class="candy-note">
+    <div id="note-body" class="candy-note">
       <span class="note-heart" aria-hidden="true">♡</span>
       <p id="note-message"></p>
     </div>
 
     <button
+      id="edit-note-button"
+      class="button button-lavender note-edit-button"
+      type="button"
+      hidden
+    >
+      ✏️ Edit Note
+    </button>
+
+    <form id="note-edit-form" hidden novalidate>
+      <label for="note-edit-input">A fresh little message</label>
+      <textarea
+        id="note-edit-input"
+        name="message"
+        rows="4"
+        maxlength="150"
+        placeholder="You make the world a little brighter…"
+        aria-describedby="note-edit-count"
+        required
+      ></textarea>
+
+      <div class="message-meta">
+        <span>Kind words can always get sweeter ♡</span>
+        <span id="note-edit-count">0 / 150</span>
+      </div>
+
+      <p id="note-edit-error" class="form-error" role="alert" hidden></p>
+
+      <div class="note-edit-actions">
+        <button
+          id="note-edit-cancel"
+          class="button button-lavender"
+          type="button"
+        >
+          Cancel
+        </button>
+        <button
+          class="button button-pink submit-button"
+          type="submit"
+        >
+          💗 Save Note
+        </button>
+      </div>
+    </form>
+
+    <button
+      id="note-return-button"
       class="button button-lavender note-return"
       type="button"
       data-close
