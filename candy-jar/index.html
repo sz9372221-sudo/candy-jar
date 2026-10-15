@@ -702,14 +702,27 @@
       <p id="note-message"></p>
     </div>
 
-    <button
-      id="edit-note-button"
-      class="button button-lavender note-edit-button"
-      type="button"
-      hidden
-    >
-      ✏️ Edit Note
-    </button>
+    <div class="note-owner-actions">
+      <button
+        id="edit-note-button"
+        class="button button-lavender note-edit-button"
+        type="button"
+        hidden
+      >
+        ✏️ Edit Note
+      </button>
+
+      <button
+        id="delete-note-button"
+        class="button button-lavender note-delete-button"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="delete-candy-dialog"
+        hidden
+      >
+        🗑️ Delete
+      </button>
+    </div>
 
     <form id="note-edit-form" hidden novalidate>
       <label for="note-edit-input">A fresh little message</label>
@@ -755,6 +768,43 @@
     >
       Back to the Jar
     </button>
+  </dialog>
+
+  <!-- Delete a candy confirmation -->
+  <dialog
+    id="delete-candy-dialog"
+    class="modal delete-modal delete-candy-modal"
+    aria-labelledby="delete-candy-title"
+    aria-describedby="delete-candy-description"
+  >
+    <span class="delete-modal-sparkle" aria-hidden="true">✦</span>
+    <span
+      class="delete-modal-sparkle delete-modal-sparkle-second"
+      aria-hidden="true"
+    >💧</span>
+
+    <button
+      class="modal-close"
+      type="button"
+      aria-label="Close"
+      data-close
+    >✕</button>
+
+    <div class="modal-icon" aria-hidden="true">🥺</div>
+    <h2 id="delete-candy-title">Delete this candy?</h2>
+    <p id="delete-candy-description" class="modal-description">
+      This little sweetness will be gone from the jar. This can't be
+      undone 🥺
+    </p>
+
+    <form id="delete-candy-form" class="delete-actions">
+      <button class="button button-lavender" type="button" data-close>
+        Cancel
+      </button>
+      <button class="button button-danger" type="submit">
+        🗑️ Delete
+      </button>
+    </form>
   </dialog>
 
   <!-- My sweet jars shelf -->

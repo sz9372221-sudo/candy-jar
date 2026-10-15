@@ -926,6 +926,31 @@ p {
   animation-delay: -4s;
 }
 
+/* A little confirmation for one candy at a time */
+
+.delete-candy-modal {
+  width: min(330px, calc(100vw - 32px));
+  padding: 30px 22px 26px;
+}
+
+.delete-candy-modal .modal-icon {
+  font-size: 2rem;
+  margin-bottom: 4px;
+}
+
+.delete-candy-modal h2 {
+  font-size: 1.3rem;
+}
+
+.delete-candy-modal .modal-description {
+  font-size: .85rem;
+}
+
+.delete-candy-modal .delete-actions {
+  margin-top: 20px;
+  gap: 10px;
+}
+
 @keyframes sad-jar-wobble {
   0%,
   100% {
@@ -968,6 +993,35 @@ p {
   line-height: 1.8;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+.note-owner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.note-owner-actions .button {
+  flex: 1 1 auto;
+  min-height: 44px;
+  margin-top: 0;
+  padding: 9px 16px;
+  font-size: .95rem;
+}
+
+.note-delete-button {
+  background: linear-gradient(#FFE4DA, #FFCEBF);
+  box-shadow:
+    0 4px 0 #E9A48E,
+    0 10px 22px #D9705F20;
+  color: #A34A34;
+}
+
+@media (hover: hover) {
+  .note-delete-button:hover:not(:disabled) {
+    background: linear-gradient(#FFD4C6, #F5B5A1);
+  }
 }
 
 .note-return {
