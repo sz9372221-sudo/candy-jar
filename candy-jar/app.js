@@ -1073,10 +1073,14 @@
       currentNote = {
         code,
         id: typeof record?.id === "string" ? record.id : null,
+        message: typeof message === "string" ? message : "",
         isEditable: canEditCandy(code, record)
       };
 
-      $("edit-note-button").hidden = !currentNote.isEditable;
+      const editable = currentNote.isEditable;
+
+      $("edit-note-button").hidden = !editable;
+      $("delete-note-button").hidden = !editable;
 
       showDialog($("note-dialog"));
     } finally {
@@ -1138,6 +1142,7 @@
 
     $("note-body").hidden = true;
     $("edit-note-button").hidden = true;
+    $("delete-note-button").hidden = true;
     $("note-return-button").hidden = true;
     $("note-edit-form").hidden = false;
 
@@ -1151,6 +1156,7 @@
     $("note-edit-form").hidden = true;
     $("note-body").hidden = false;
     $("edit-note-button").hidden = !currentNote?.isEditable;
+    $("delete-note-button").hidden = !currentNote?.isEditable;
     $("note-return-button").hidden = false;
   }
 
@@ -1164,6 +1170,84 @@
     exitNoteEditMode();
     clearError("note-edit-error");
     $("edit-note-button").focus({ preventScroll: true });
+  }
+
+  /* ========================================================
+     Deleting a candy note
+     ======================================================== */
+
+  function openDeleteCandyDialog() {
+    // The delete button only appears to the candy's owner, so
+    // reaching this page without one means the state moved on.
+    if (!currentNote?.isEditable || addingCandy) return;
+
+    showDialog($("delete-candy-dialog"));
+  }
+
+  async function deleteCurrentCandy() {
+    const note = currentNote;
+    const code = note?.code;
+    const version = routeVersion;
+
+    if (!note || !code) return;
+
+    try {
+      const data = readStore();
+      const jar = getJar(data, code);
+
+      if (!jar || !Array.isArray(jar.candies)) {
+        await closeDialog($("delete-candy-dialog"));
+        await closeDialog($("note-dialog"));
+        setStatus("That candy is no longer in the jar 🍭");
+        return;
+      }
+
+      // Re-reading storage here keeps a stale popup from erasing
+      // something that changed since the note was opened.
+      const records = getCandyRecords(jar);
+      const index = records.findIndex(
+        candy => candy.id === note.id
+      );
+
+      if (
+        index === -1 ||
+        !canEditCandy(code, records[index])
+      ) {
+        await closeDialog($("delete-candy-dialog"));
+        await closeDialog($("note-dialog"));
+        setStatus("Only the candy's owner can delete it 💗");
+        return;
+      }
+
+      records.splice(index, 1);
+      jar.candies = records;
+      jar.capacity = CAPACITY;
+
+      // Persist before the jar above updates, so nothing flickers
+      // a candy that is already gone.
+      writeStore(data);
+
+      await closeDialog($("delete-candy-dialog"));
+
+      // The popup closes along with the candy it was opened for.
+      await closeDialog($("note-dialog"));
+
+      if (version === routeVersion && activeCode === code) {
+        renderPage(jar, code);
+
+        void animateElement($("candy-count"), [
+          { opacity: .4, transform: "translateY(3px)" },
+          { opacity: 1, transform: "translateY(0)" }
+        ], { duration: 220 });
+
+        setStatus("One little candy said goodbye 🍭");
+      }
+    } catch (error) {
+      console.error("Could not delete candy:", error);
+      await closeDialog($("delete-candy-dialog"));
+      await closeDialog($("note-dialog"));
+      setStatus("We couldn't delete that candy. Please try again 🍭");
+    }
   }
 
   async function saveNoteEdit() {
@@ -1946,6 +2030,8 @@
 
   $("edit-note-button").addEventListener("click", enterNoteEditMode);
 
+  $("delete-note-button").addEventListener("click", openDeleteCandyDialog);
+
   $("note-edit-cancel").addEventListener("click", cancelNoteEdit);
 
   $("note-edit-input").addEventListener("input", () => {
@@ -2027,6 +2113,7 @@
   bindSubmit("add-form", addCandy);
   bindSubmit("edit-form", editJar);
   bindSubmit("delete-form", deleteJar);
+  bindSubmit("delete-candy-form", deleteCurrentCandy);
   bindSubmit("note-edit-form", saveNoteEdit);
 
   window.addEventListener("hashchange", renderRoute);
