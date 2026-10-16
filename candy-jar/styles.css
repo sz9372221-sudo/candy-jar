@@ -375,6 +375,67 @@ p {
   }
 }
 
+/* Profile badge */
+
+.profile-badge {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: min(48vw, 240px);
+  padding: 8px 15px 8px 12px;
+  border: 1px solid #FFC6DE;
+  border-radius: var(--radius-pill);
+  background: #FFFFFFE0;
+  box-shadow:
+    0 4px 0 #EBC6DA,
+    0 10px 22px #C98AAE2E;
+  color: var(--deep-pink);
+  font: 600 .92rem var(--font-display);
+  line-height: 1.2;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition:
+    transform 180ms var(--ease-out),
+    background-color 180ms ease;
+}
+
+.profile-badge-candy {
+  font-size: 1.05rem;
+  animation: profile-badge-bob 3.4s ease-in-out infinite;
+}
+
+.profile-badge-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .profile-badge:hover {
+    transform: translateY(-2px);
+    background: #FFFFFF;
+  }
+}
+
+.profile-badge:active {
+  transform: translateY(2px);
+}
+
+@keyframes profile-badge-bob {
+  0%,
+  100% {
+    transform: rotate(-8deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(8deg) scale(1.08);
+  }
+}
+
 /* Jar */
 
 .jar-figure {
@@ -928,6 +989,70 @@ p {
   .welcome-username.is-wiggling {
     animation: none;
   }
+}
+
+/* Profile popup */
+
+.profile-modal {
+  border-color: #FFC6DE;
+  background:
+    radial-gradient(
+      circle at 50% 3%,
+      #FFFFFFFA 0%,
+      #FFF3F9 60%,
+      #F2E6FF 100%
+    );
+}
+
+.profile-modal-sparkle {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  color: #D77EA5;
+  font-size: 18px;
+  pointer-events: none;
+  animation: decoration-float 9s ease-in-out infinite;
+}
+
+.profile-modal-sparkle-second {
+  top: auto;
+  right: 26px;
+  bottom: 22px;
+  left: auto;
+  color: #BE942F;
+  font-size: 16px;
+  animation-duration: 11s;
+  animation-delay: -4s;
+}
+
+.profile-username {
+  margin: 16px 0 22px;
+  color: #C2477E;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.profile-change-button {
+  width: 100%;
+  min-height: 46px;
+  padding: 13px 18px;
+  font-size: 1rem;
+}
+
+.profile-form-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.profile-form-actions .button {
+  min-height: 46px;
+  padding: 13px 16px;
+  font-size: 1rem;
 }
 
 /* Delete jar confirmation */
@@ -1573,6 +1698,18 @@ p {
     left: 16px;
     bottom: calc(18px + env(safe-area-inset-bottom));
     font-size: .97rem;
+  }
+
+  .profile-badge {
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    max-width: min(46vw, 200px);
+    padding: 7px 13px 7px 10px;
+    font-size: .86rem;
+  }
+
+  .profile-form-actions {
+    grid-template-columns: 1fr;
   }
 
   .jars-drawer-panel {

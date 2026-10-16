@@ -11,6 +11,7 @@
   const CAPACITY = 50;
   const MESSAGE_LIMIT = 150;
   const NAME_LIMIT = 24;
+  const NAME_INPUT_LIMIT = 32;
   const SVG_NS = "http://www.w3.org/2000/svg";
 
   const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -712,14 +713,14 @@
     // once; a later hello can only fill in the chosen name.
     if (!existingIdentity) {
       saveIdentity({
-        name: name.slice(0, 32),
+        name: name.slice(0, NAME_INPUT_LIMIT),
         username: makeUsername(name),
         token: makeIdentityToken(),
         createdAt: Date.now()
       });
     } else if (existingIdentity.isPlaceholder) {
       saveIdentity({
-        name: name.slice(0, 32),
+        name: name.slice(0, NAME_INPUT_LIMIT),
         username: makeUsername(name),
         token: existingIdentity.token,
         createdAt: existingIdentity.createdAt,
@@ -728,6 +729,8 @@
     }
 
     const identity = getIdentity();
+
+    renderProfileBadge();
 
     // A returning visitor may own jars created before the identity
     // system; once the identity exists, their ownership carries over.
@@ -747,6 +750,109 @@
 
     $("welcome-greeting").classList.remove("is-wiggling");
     await closeDialog($("welcome-dialog"));
+  }
+
+  /* ========================================================
+     Visitor profile
+
+     The sweet badge in the corner shows the identity's
+     username. Changing the name mints a fresh username but
+     keeps the same identity token, so jars and candies stay
+     linked to this visitor.
+     ======================================================== */
+
+  function renderProfileBadge() {
+    const identity = getIdentity();
+    const badge = $("profile-badge");
+
+    if (!identity) {
+      badge.hidden = true;
+      return;
+    }
+
+    $("profile-badge-name").textContent = identity.username;
+    badge.hidden = false;
+    badge.setAttribute("aria-label", `Your profile — ${identity.username}`);
+  }
+
+  function showProfileView() {
+    $("profile-username").textContent = getIdentity()?.username || "";
+    $("name-form").hidden = true;
+    $("profile-view").hidden = false;
+    clearError("name-error");
+  }
+
+  function openProfileDialog() {
+    if (!getIdentity()) return;
+
+    showProfileView();
+    showDialog($("profile-dialog"));
+  }
+
+  function setProfileNameCount() {
+    $("profile-name-count").textContent =
+      `${$("name-input").value.length} / ${NAME_INPUT_LIMIT}`;
+  }
+
+  function enterNameEditMode() {
+    const identity = getIdentity();
+
+    if (!identity) return;
+
+    const input = $("name-input");
+
+    input.value = typeof identity.name === "string"
+      ? identity.name.slice(0, NAME_INPUT_LIMIT)
+      : "";
+
+    setProfileNameCount();
+    clearError("name-error");
+
+    $("profile-view").hidden = true;
+    $("name-form").hidden = false;
+
+    input.focus({ preventScroll: true });
+
+    // Ready to retype the whole name straight away.
+    input.setSelectionRange(input.value.length, input.value.length);
+  }
+
+  function cancelNameEdit() {
+    showProfileView();
+    $("change-name-button").focus({ preventScroll: true });
+  }
+
+  async function saveNameChange() {
+    clearError("name-error");
+
+    const name = $("name-input").value.replace(/\s+/g, " ").trim();
+
+    if (!name) {
+      showError("name-error", "A little name helps us greet you ♡");
+      $("name-input").focus();
+      return;
+    }
+
+    const identity = getOrCreateIdentity();
+
+    const updated = {
+      name: name.slice(0, NAME_INPUT_LIMIT),
+      username: makeUsername(name),
+      token: identity.token,
+      createdAt: identity.createdAt,
+      isPlaceholder: false
+    };
+
+    saveIdentity(updated);
+    renderProfileBadge();
+    showProfileView();
+
+    void animateElement($("profile-username"), [
+      { opacity: .35, transform: "translateY(4px) scale(.97)" },
+      { opacity: 1, transform: "translateY(0) scale(1)" }
+    ], { duration: 240 });
+
+    setStatus(`Your sweet new name is ready, ${updated.username} ✨`);
   }
 
   /* ========================================================
@@ -1843,6 +1949,8 @@
 
     closeJarsDrawer();
 
+    renderProfileBadge();
+
     setStatus("");
 
     const code = currentRouteCode();
@@ -2291,8 +2399,20 @@
     });
   });
 
+  $("profile-badge").addEventListener("click", openProfileDialog);
+
+  $("change-name-button").addEventListener("click", enterNameEditMode);
+
+  $("name-cancel").addEventListener("click", cancelNameEdit);
+
+  $("name-input").addEventListener("input", () => {
+    setProfileNameCount();
+    clearError("name-error");
+  });
+
   bindSubmit("create-form", createJar);
   bindSubmit("welcome-form", submitWelcome);
+  bindSubmit("name-form", saveNameChange);
   bindSubmit("join-form", joinJar);
   bindSubmit("add-form", addCandy);
   bindSubmit("edit-form", editJar);

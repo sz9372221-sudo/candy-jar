@@ -31,6 +31,20 @@
     <span style="--x:39%;--y:8%;--delay:-7s;--duration:12s">✧</span>
   </div>
 
+  <!-- The visitor's sweet identity badge -->
+  <button
+    id="profile-badge"
+    class="profile-badge"
+    type="button"
+    aria-haspopup="dialog"
+    aria-controls="profile-dialog"
+    aria-label="Your profile"
+    hidden
+  >
+    <span class="profile-badge-candy" aria-hidden="true">🍬</span>
+    <span id="profile-badge-name" class="profile-badge-name"></span>
+  </button>
+
   <main id="app" class="app is-home">
     <button
       id="back-button"
@@ -424,6 +438,79 @@
     <div id="welcome-success" hidden>
       <p class="welcome-username" id="welcome-greeting"></p>
     </div>
+  </dialog>
+
+  <!-- The visitor's profile -->
+  <dialog
+    id="profile-dialog"
+    class="modal profile-modal"
+    aria-labelledby="profile-title"
+    aria-describedby="profile-description"
+  >
+    <span class="profile-modal-sparkle" aria-hidden="true">✦</span>
+    <span
+      class="profile-modal-sparkle profile-modal-sparkle-second"
+      aria-hidden="true"
+    >♥</span>
+
+    <button
+      class="modal-close"
+      type="button"
+      aria-label="Close"
+      data-close
+    >✕</button>
+
+    <div class="modal-icon" aria-hidden="true">🍬</div>
+    <h2 id="profile-title">Your Sweet Name</h2>
+    <p id="profile-description" class="modal-description">
+      This is how friends see you in every jar.
+    </p>
+
+    <div id="profile-view">
+      <p id="profile-username" class="profile-username"></p>
+
+      <button
+        id="change-name-button"
+        class="button button-lavender profile-change-button"
+        type="button"
+      >
+        ✏️ Change my name
+      </button>
+    </div>
+
+    <form id="name-form" hidden novalidate>
+      <label for="name-input">Your new name</label>
+      <input
+        id="name-input"
+        name="name"
+        type="text"
+        maxlength="32"
+        placeholder="Sara"
+        autocomplete="off"
+        spellcheck="false"
+        required
+      >
+
+      <div class="name-meta">
+        <span>Something sweet, up to 32 letters ♡</span>
+        <span id="profile-name-count">0 / 32</span>
+      </div>
+
+      <p id="name-error" class="form-error" role="alert" hidden></p>
+
+      <div class="profile-form-actions">
+        <button
+          id="name-cancel"
+          class="button button-lavender"
+          type="button"
+        >
+          Cancel
+        </button>
+        <button class="button button-pink submit-button" type="submit">
+          💗 Save New Name
+        </button>
+      </div>
+    </form>
   </dialog>
 
   <!-- Create jar -->
