@@ -6,7 +6,7 @@
      ======================================================== */
 
   const STORE_KEY = "kindJars.v1";
-  const OWNER_TOKEN_KEY = "kindJars.ownerToken.v1";
+  const LEGACY_OWNER_TOKEN_KEY = "kindJars.ownerToken.v1";
   const IDENTITY_KEY = "kindJars.identity.v1";
   const CAPACITY = 50;
   const MESSAGE_LIMIT = 150;
@@ -136,27 +136,21 @@
     throw new Error("Could not generate an available jar code");
   }
 
-  function makeOwnerToken() {
-    return Array.from(
-      crypto.getRandomValues(new Uint8Array(32)),
-      value => value.toString(16).padStart(2, "0")
-    ).join("");
-  }
-
-  function getBrowserOwnerToken() {
-    let token = localStorage.getItem(OWNER_TOKEN_KEY);
-
-    if (!token) {
-      token = makeOwnerToken();
-      localStorage.setItem(OWNER_TOKEN_KEY, token);
-    }
-
-    return token;
+  /*
+   * Ownership is the visitor's permanent identity token — the one
+   * created with the welcome hello — not a separate random key.
+   * Jars and candies remember that token.
+   */
+  function getOwnershipToken() {
+    return getOrCreateIdentity().token;
   }
 
   function isJarOwner(jar) {
-    const browserToken = localStorage.getItem(OWNER_TOKEN_KEY);
-    return Boolean(jar && browserToken && jar.ownerToken === browserToken);
+    const identityToken = getIdentity()?.token;
+
+    return Boolean(
+      jar && identityToken && jar.ownerToken === identityToken
+    );
   }
   function makeCandyId() {
     if (typeof crypto.randomUUID === "function") {
@@ -207,6 +201,30 @@
   function makeUsername(name) {
     const suffix = crypto.getRandomValues(new Uint16Array(1))[0] % 10000;
     return `${name}_${String(suffix).padStart(4, "0")}`;
+  }
+
+  /*
+   * A visitor who skipped the welcome hello (or whose identity has
+   * only a placeholder name) still owns their jars, so a fallback
+   * identity is created on first use. The welcome flow later adopts
+   * the chosen name without ever changing the token.
+   */
+  function getOrCreateIdentity() {
+    let identity = getIdentity();
+
+    if (!identity) {
+      identity = {
+        name: "Friend",
+        username: makeUsername("Friend"),
+        token: makeIdentityToken(),
+        createdAt: Date.now(),
+        isPlaceholder: true
+      };
+
+      saveIdentity(identity);
+    }
+
+    return identity;
   }
 
   /* ========================================================
@@ -688,17 +706,32 @@
       return;
     }
 
-    // The identity is permanent, so it is written exactly once.
-    if (!getIdentity()) {
+    const existingIdentity = getIdentity();
+
+    // The identity is permanent, so the token is written exactly
+    // once; a later hello can only fill in the chosen name.
+    if (!existingIdentity) {
       saveIdentity({
         name: name.slice(0, 32),
         username: makeUsername(name),
         token: makeIdentityToken(),
         createdAt: Date.now()
       });
+    } else if (existingIdentity.isPlaceholder) {
+      saveIdentity({
+        name: name.slice(0, 32),
+        username: makeUsername(name),
+        token: existingIdentity.token,
+        createdAt: existingIdentity.createdAt,
+        isPlaceholder: false
+      });
     }
 
     const identity = getIdentity();
+
+    // A returning visitor may own jars created before the identity
+    // system; once the identity exists, their ownership carries over.
+    migrateLegacyOwnerTokens();
 
     $("welcome-greeting").textContent =
       `Nice to meet you, ${identity.username}! 🍬`;
@@ -1189,14 +1222,14 @@
      ======================================================== */
 
   /*
-   * One browser token guards the whole jar; it may edit any
-   * candy inside. Candies remember which browser added them,
-   * so joiners can reword their own notes too. Only candies
-   * stored one by one can be edited — the earliest format
-   * saved a plain candy count with nothing to reword.
+   * The visitor's permanent identity token guards the whole jar; it
+   * may edit any candy inside. Candies remember which identity added
+   * them, so joiners can reword their own notes too. Only candies
+   * stored one by one can be edited — the earliest format saved a
+   * plain candy count with nothing to reword.
    */
   function canEditCandy(code, record) {
-    const token = localStorage.getItem(OWNER_TOKEN_KEY);
+    const token = getIdentity()?.token;
 
     if (
       !token ||
@@ -1219,6 +1252,60 @@
       console.error("Could not read candy owner:", error);
       return false;
     }
+  }
+
+  /*
+   * Jars and candies created before the identity system referenced a
+   * separate random owner token. Rewrite those references to the
+   * visitor's identity token once, so existing ownership survives
+   * the switch.
+   */
+  function migrateLegacyOwnerTokens() {
+    const legacyToken = window.localStorage.getItem(
+      LEGACY_OWNER_TOKEN_KEY
+    );
+
+    if (!legacyToken) return;
+
+    const identityToken = getIdentity()?.token;
+
+    if (!identityToken) {
+      // Revisit once the welcome hello has created an identity.
+      return;
+    }
+
+    if (identityToken === legacyToken) {
+      window.localStorage.removeItem(LEGACY_OWNER_TOKEN_KEY);
+      return;
+    }
+
+    try {
+      const data = readStore();
+      let changed = false;
+
+      for (const jar of Object.values(data)) {
+        if (jar?.ownerToken === legacyToken) {
+          jar.ownerToken = identityToken;
+          changed = true;
+        }
+
+        if (Array.isArray(jar?.candies)) {
+          for (const candy of jar.candies) {
+            if (candy?.authorToken === legacyToken) {
+              candy.authorToken = identityToken;
+              changed = true;
+            }
+          }
+        }
+      }
+
+      if (changed) writeStore(data);
+    } catch (error) {
+      console.error("Could not migrate owner tokens:", error);
+      return;
+    }
+
+    window.localStorage.removeItem(LEGACY_OWNER_TOKEN_KEY);
   }
 
   function setNoteEditCount() {
@@ -1826,7 +1913,7 @@
         name: name.slice(0, NAME_LIMIT),
         candies: [],
         capacity: CAPACITY,
-        ownerToken: getBrowserOwnerToken(),
+        ownerToken: getOwnershipToken(),
         createdAt: Date.now()
       };
 
@@ -1984,7 +2071,7 @@
       records.push({
         id: makeCandyId(),
         message,
-        authorToken: getBrowserOwnerToken(),
+        authorToken: getOwnershipToken(),
         createdAt: Date.now()
       });
 
@@ -2243,6 +2330,9 @@
   if (!getIdentity()) {
     setTimeout(showWelcomeModal, 500);
   }
+
+  // Carry any pre-identity ownership over before the first render.
+  migrateLegacyOwnerTokens();
 
   renderRoute();
 })();
