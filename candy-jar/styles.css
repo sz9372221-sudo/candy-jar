@@ -375,7 +375,7 @@ p {
   }
 }
 
-/* Profile badge */
+/* Profile badge — a little wrapped candy */
 
 .profile-badge {
   position: fixed;
@@ -384,55 +384,129 @@ p {
   z-index: 30;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  max-width: min(48vw, 240px);
-  padding: 8px 15px 8px 12px;
-  border: 1px solid #FFC6DE;
+  justify-content: center;
+  max-width: min(52vw, 230px);
+  min-height: 42px;
+  padding: 9px 22px;
+  border: 2px solid #FFFFFFB8;
   border-radius: var(--radius-pill);
-  background: #FFFFFFE0;
+  background:
+    linear-gradient(115deg, #FFFFFFA6 0%, #FFFFFF00 46%),
+    linear-gradient(135deg, #FFE9F4 0%, #FFC3DE 48%, #E8D9FF 100%);
   box-shadow:
-    0 4px 0 #EBC6DA,
-    0 10px 22px #C98AAE2E;
+    0 5px 0 #E1A6C5,
+    0 12px 22px #C98AAE33,
+    inset 0 3px 7px #FFFFFFC9,
+    inset 0 -7px 12px #E9A6C83D;
   color: var(--deep-pink);
   font: 600 .92rem var(--font-display);
   line-height: 1.2;
   cursor: pointer;
-  backdrop-filter: blur(6px);
   transition:
     transform 180ms var(--ease-out),
-    background-color 180ms ease;
+    box-shadow 180ms ease;
 }
 
-.profile-badge-candy {
-  font-size: 1.05rem;
-  animation: profile-badge-bob 3.4s ease-in-out infinite;
+/* Twisted wrapper ends on both sides */
+.profile-badge::before,
+.profile-badge::after {
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 34px;
+  content: "";
+  pointer-events: none;
+}
+
+.profile-badge::before {
+  left: -16px;
+  transform: translateY(-50%);
+  background:
+    linear-gradient(180deg, #FFFFFF8F, #FFFFFF00 62%),
+    linear-gradient(90deg, #F3D3EE, #FFBEDF);
+  clip-path: polygon(100% 0, 52% 0, 0 50%, 52% 100%, 100% 100%);
+}
+
+.profile-badge::after {
+  right: -16px;
+  transform: translateY(-50%);
+  background:
+    linear-gradient(180deg, #FFFFFF8F, #FFFFFF00 62%),
+    linear-gradient(90deg, #FFBEDF, #E0CCF7);
+  clip-path: polygon(0 0, 48% 0, 100% 50%, 48% 100%, 0 100%);
 }
 
 .profile-badge-name {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: .01em;
+  text-shadow: 0 1px 0 #FFFFFFB8;
+}
+
+/* Tiny twinkling shine */
+.profile-badge-candy {
+  position: absolute;
+  top: -8px;
+  right: 9px;
+  width: 14px;
+  height: 14px;
+  overflow: visible;
+  font-size: 0;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.profile-badge-candy::before {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #FFFBE8;
+  font-size: 14px;
+  line-height: 1;
+  content: "✦";
+  text-shadow:
+    0 0 5px #FFE29A,
+    0 0 11px #FFD1A0;
+  animation: profile-badge-shine 3s ease-in-out infinite;
 }
 
 @media (hover: hover) {
   .profile-badge:hover {
-    transform: translateY(-2px);
-    background: #FFFFFF;
+    transform: translateY(-3px);
+    box-shadow:
+      0 7px 0 #E1A6C5,
+      0 16px 24px #C98AAE40,
+      inset 0 3px 7px #FFFFFFD4,
+      inset 0 -7px 12px #E9A6C83D;
+  }
+
+  .profile-badge:hover .profile-badge-candy::before {
+    animation-duration: 1.4s;
   }
 }
 
 .profile-badge:active {
   transform: translateY(2px);
+  box-shadow:
+    0 2px 0 #E1A6C5,
+    0 6px 12px #C98AAE33,
+    inset 0 3px 7px #FFFFFFC9,
+    inset 0 -7px 12px #E9A6C83D;
 }
 
-@keyframes profile-badge-bob {
+@keyframes profile-badge-shine {
   0%,
   100% {
-    transform: rotate(-8deg) scale(1);
+    opacity: .4;
+    transform: scale(.7) rotate(0deg);
   }
 
   50% {
-    transform: rotate(8deg) scale(1.08);
+    opacity: 1;
+    transform: scale(1.15) rotate(18deg);
   }
 }
 
@@ -1703,9 +1777,24 @@ p {
   .profile-badge {
     top: max(12px, env(safe-area-inset-top));
     right: max(12px, env(safe-area-inset-right));
-    max-width: min(46vw, 200px);
-    padding: 7px 13px 7px 10px;
+    max-width: min(46vw, 190px);
+    min-height: 38px;
+    padding: 8px 16px;
     font-size: .86rem;
+  }
+
+  .profile-badge::before,
+  .profile-badge::after {
+    width: 17px;
+    height: 29px;
+  }
+
+  .profile-badge::before {
+    left: -12px;
+  }
+
+  .profile-badge::after {
+    right: -12px;
   }
 
   .profile-form-actions {
