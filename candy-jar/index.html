@@ -381,6 +381,51 @@
     </button>
   </main>
 
+  <!-- First-visit welcome identity -->
+  <dialog
+    id="welcome-dialog"
+    class="modal welcome-modal"
+    aria-labelledby="welcome-title"
+    aria-describedby="welcome-description"
+  >
+    <span class="welcome-sparkle" aria-hidden="true">✦</span>
+    <span
+      class="welcome-sparkle welcome-sparkle-second"
+      aria-hidden="true"
+    >♥</span>
+
+    <div class="modal-icon" aria-hidden="true">🍬</div>
+    <h2 id="welcome-title">Welcome, new friend!</h2>
+    <p id="welcome-description" class="modal-description">
+      You found a little jar of kindness. What's your name,
+      so we can call you something sweet?
+    </p>
+
+    <form id="welcome-form">
+      <label for="welcome-name-input">Your name</label>
+      <input
+        id="welcome-name-input"
+        name="name"
+        type="text"
+        maxlength="32"
+        placeholder="Sara"
+        autocomplete="off"
+        spellcheck="false"
+        required
+      >
+
+      <p id="welcome-error" class="form-error" role="alert" hidden></p>
+
+      <button class="button button-pink submit-button" type="submit">
+        🍬 Take a Name
+      </button>
+    </form>
+
+    <div id="welcome-success" hidden>
+      <p class="welcome-username" id="welcome-greeting"></p>
+    </div>
+  </dialog>
+
   <!-- Create jar -->
   <dialog
     id="create-dialog"

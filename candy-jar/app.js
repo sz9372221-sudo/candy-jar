@@ -7,6 +7,7 @@
 
   const STORE_KEY = "kindJars.v1";
   const OWNER_TOKEN_KEY = "kindJars.ownerToken.v1";
+  const IDENTITY_KEY = "kindJars.identity.v1";
   const CAPACITY = 50;
   const MESSAGE_LIMIT = 150;
   const NAME_LIMIT = 24;
@@ -166,6 +167,46 @@
       crypto.getRandomValues(new Uint8Array(12)),
       value => value.toString(16).padStart(2, "0")
     ).join("");
+  }
+
+  /* ========================================================
+     Permanent identity for this visitor
+     ======================================================== */
+
+  function getIdentity() {
+    try {
+      const identity = JSON.parse(localStorage.getItem(IDENTITY_KEY));
+
+      return identity &&
+        typeof identity === "object" &&
+        typeof identity.username === "string" &&
+        typeof identity.token === "string"
+        ? identity
+        : null;
+    } catch (error) {
+      console.error("Could not read identity:", error);
+      return null;
+    }
+  }
+
+  function saveIdentity(identity) {
+    localStorage.setItem(IDENTITY_KEY, JSON.stringify(identity));
+  }
+
+  function makeIdentityToken() {
+    if (typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID().replaceAll("-", "");
+    }
+
+    return Array.from(
+      crypto.getRandomValues(new Uint8Array(16)),
+      value => value.toString(16).padStart(2, "0")
+    ).join("");
+  }
+
+  function makeUsername(name) {
+    const suffix = crypto.getRandomValues(new Uint16Array(1))[0] % 10000;
+    return `${name}_${String(suffix).padStart(4, "0")}`;
   }
 
   /* ========================================================
@@ -618,6 +659,61 @@
         submit.disabled = false;
       }
     });
+  }
+
+  /* ========================================================
+     First-visit welcome
+     ======================================================== */
+
+  const WELCOME_GREETING_MS = 2600;
+
+  function showWelcomeModal() {
+    const form = $("welcome-form");
+
+    form.reset();
+    clearError("welcome-error");
+    form.hidden = false;
+    $("welcome-success").hidden = true;
+
+    showDialog($("welcome-dialog"));
+  }
+
+  async function submitWelcome() {
+    clearError("welcome-error");
+
+    const name = $("welcome-name-input").value.replace(/\s+/g, " ").trim();
+
+    if (!name) {
+      showError("welcome-error", "A little name helps us greet you ♡");
+      return;
+    }
+
+    // The identity is permanent, so it is written exactly once.
+    if (!getIdentity()) {
+      saveIdentity({
+        name: name.slice(0, 32),
+        username: makeUsername(name),
+        token: makeIdentityToken(),
+        createdAt: Date.now()
+      });
+    }
+
+    const identity = getIdentity();
+
+    $("welcome-greeting").textContent =
+      `Nice to meet you, ${identity.username}! 🍬`;
+    $("welcome-form").hidden = true;
+    $("welcome-success").hidden = false;
+
+    if (!reducedMotion()) {
+      $("welcome-greeting").classList.add("is-wiggling");
+    }
+
+    // Let the sweet little hello linger before letting them in.
+    await new Promise(resolve => setTimeout(resolve, WELCOME_GREETING_MS));
+
+    $("welcome-greeting").classList.remove("is-wiggling");
+    await closeDialog($("welcome-dialog"));
   }
 
   /* ========================================================
@@ -2109,6 +2205,7 @@
   });
 
   bindSubmit("create-form", createJar);
+  bindSubmit("welcome-form", submitWelcome);
   bindSubmit("join-form", joinJar);
   bindSubmit("add-form", addCandy);
   bindSubmit("edit-form", editJar);
@@ -2140,6 +2237,12 @@
       console.error("Could not refresh jar:", error);
     }
   });
+
+  // Everyone gets a first-visit hello unless they already
+  // picked a name on a previous visit.
+  if (!getIdentity()) {
+    setTimeout(showWelcomeModal, 500);
+  }
 
   renderRoute();
 })();

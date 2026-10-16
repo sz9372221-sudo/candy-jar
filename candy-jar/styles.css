@@ -859,6 +859,77 @@ p {
   margin-top: 22px;
 }
 
+/* First-visit welcome identity */
+
+.welcome-modal {
+  overflow-y: visible;
+  border-color: #FFB7D7;
+  background:
+    radial-gradient(
+      circle at 50% 4%,
+      #FFFFFFFA 0%,
+      #FFF3F8 58%,
+      #FFD9EC 100%
+    );
+}
+
+.welcome-sparkle {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  color: #D77EA5;
+  font-size: 20px;
+  pointer-events: none;
+  animation: decoration-float 9s ease-in-out infinite;
+}
+
+.welcome-sparkle-second {
+  top: auto;
+  right: 28px;
+  bottom: 24px;
+  left: auto;
+  color: #BE942F;
+  font-size: 17px;
+  animation-duration: 11s;
+  animation-delay: -4s;
+}
+
+.welcome-modal .modal-icon {
+  animation: welcome-wiggle 2.4s ease-in-out infinite;
+}
+
+.welcome-username {
+  margin: 18px 0 4px;
+  color: #C2477E;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.welcome-username.is-wiggling {
+  animation: welcome-name-wiggle 1.1s ease-in-out infinite;
+}
+
+@keyframes welcome-wiggle {
+  0%, 100% { transform: rotate(-7deg) scale(1); }
+  50% { transform: rotate(7deg) scale(1.08); }
+}
+
+@keyframes welcome-name-wiggle {
+  0%, 100% { transform: rotate(-2deg) scale(1); }
+  50% { transform: rotate(2deg) scale(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-modal .modal-icon,
+  .welcome-sparkle,
+  .welcome-username.is-wiggling {
+    animation: none;
+  }
+}
+
 /* Delete jar confirmation */
 
 .delete-modal {
