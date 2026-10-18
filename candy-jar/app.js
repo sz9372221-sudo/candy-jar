@@ -46,6 +46,7 @@
   let cancelFlight = null;
   let closingDrawer = false;
   let currentNote = null;
+  let magicWelcomeStatus = null;
 
   const closingDialogs = new WeakMap();
   const dialogAnimations = new WeakMap();
@@ -853,6 +854,225 @@
     ], { duration: 240 });
 
     setStatus(`Your sweet new name is ready, ${updated.username} ✨`);
+  }
+
+  /* ========================================================
+     Magic link
+
+     A shareable link that carries the identity token, so opening
+     it in any browser adopts (or restores) this visitor's sweet
+     name in one hop.
+     ======================================================== */
+
+  const MAGIC_TOKEN_PATTERN = /^[0-9a-f]{32}$/i;
+  const MAGIC_COPY_RESET_MS = 1800;
+  const MAGIC_RESTORE_DELAY_MS = 600;
+  const COPY_SPARKLE_GLYPHS = ["✨", "💖", "✦", "💕", "✧"];
+
+  let pendingMagicRestore = null;
+  let magicCopyResetTimer = null;
+
+  function buildMagicLink(identity) {
+    const params = new URLSearchParams({
+      magic: identity.token,
+      name: identity.username
+    });
+
+    return `${location.origin}${location.pathname}?${params}#/`;
+  }
+
+  function resetMagicCopyButton() {
+    clearTimeout(magicCopyResetTimer);
+    magicCopyResetTimer = null;
+
+    const button = $("magic-copy-button");
+    button.classList.remove("is-copied");
+    button.textContent = "📋 Copy Link";
+  }
+
+  function burstCopySparkles(button) {
+    if (reducedMotion()) return;
+
+    for (let index = 0; index < 9; index++) {
+      const spark = document.createElement("span");
+
+      spark.className = "copy-sparkle";
+      spark.setAttribute("aria-hidden", "true");
+      spark.textContent = COPY_SPARKLE_GLYPHS[
+        index % COPY_SPARKLE_GLYPHS.length
+      ];
+
+      const straightUp = index < 3;
+      spark.style.setProperty(
+        "--spark-dx",
+        `${straightUp
+          ? Math.random() * 26 - 13
+          : Math.random() * 170 - 85}px`
+      );
+      spark.style.setProperty(
+        "--spark-dy",
+        `${-(52 + Math.random() * 58)}px`
+      );
+      spark.style.left = `${12 + Math.random() * 76}%`;
+      spark.style.animationDelay = `${index * 55}ms`;
+
+      spark.addEventListener(
+        "animationend",
+        () => spark.remove(),
+        { once: true }
+      );
+
+      button.append(spark);
+    }
+  }
+
+  async function copyMagicLink() {
+    resetMagicCopyButton();
+
+    const input = $("magic-link-input");
+    const button = $("magic-copy-button");
+    let copied = false;
+
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard unavailable");
+      }
+
+      await navigator.clipboard.writeText(input.value);
+      copied = true;
+    } catch {
+      // Fallback: select the link so it can be copied by hand.
+      input.focus({ preventScroll: true });
+      input.select();
+
+      try {
+        copied = document.execCommand("copy");
+      } catch {
+        copied = false;
+      }
+    }
+
+    if (!copied) {
+      setStatus("Select the highlighted link and copy it by hand 🍭");
+      return;
+    }
+
+    button.classList.add("is-copied");
+    button.textContent = "✨ Copied! 💖";
+    burstCopySparkles(button);
+
+    magicCopyResetTimer = setTimeout(
+      resetMagicCopyButton,
+      MAGIC_COPY_RESET_MS
+    );
+
+    setStatus("Magic link copied! Keep it somewhere special 💗");
+  }
+
+  function openMagicLinkDialog() {
+    const identity = getIdentity();
+
+    if (!identity) return;
+
+    $("magic-link-input").value = buildMagicLink(identity);
+    resetMagicCopyButton();
+    showDialog($("magic-link-dialog"));
+  }
+
+  /*
+   * A magic link carries `?magic=<token>&name=<username>`. Opening
+   * one adopts the name and token it carries, so jars owned by that
+   * identity become this visitor's again. An existing, different
+   * identity always gets a friendly confirmation first — it never
+   * switches silently.
+   */
+  function clearMagicUrl() {
+    const url = new URL(location.href);
+
+    if (!url.search) return;
+
+    url.search = "";
+    history.replaceState(null, "", url.toString());
+  }
+
+  function adoptMagicIdentityFromUrl() {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("magic");
+
+    if (!token || !MAGIC_TOKEN_PATTERN.test(token)) return;
+
+    clearMagicUrl();
+
+    const username = (params.get("name") || "").trim();
+    const identity = getIdentity();
+
+    if (identity?.token === token) return;
+
+    if (!identity) {
+      const adoptedName = username || "Friend";
+
+      saveIdentity({
+        name: adoptedName,
+        username: username || makeUsername(adoptedName),
+        token,
+        createdAt: Date.now(),
+        isPlaceholder: false
+      });
+
+      magicWelcomeStatus =
+        `Your magic link brought you home, ` +
+        `${username || "Friend"} 💗`;
+
+      return;
+    }
+
+    pendingMagicRestore = {
+      token,
+      username: username || null
+    };
+
+    setTimeout(() => {
+      if (!pendingMagicRestore) return;
+
+      $("restore-username").textContent =
+        pendingMagicRestore.username || "the name on your link";
+      showDialog($("restore-dialog"));
+    }, MAGIC_RESTORE_DELAY_MS);
+  }
+
+  function forgetPendingMagicRestore() {
+    pendingMagicRestore = null;
+  }
+
+  async function restoreMagicIdentity() {
+    const pending = pendingMagicRestore;
+
+    if (!pending) return;
+
+    try {
+      const identity = getOrCreateIdentity();
+      const name = pending.username || identity.name;
+
+      saveIdentity({
+        name,
+        username: pending.username || makeUsername(name),
+        token: pending.token,
+        createdAt: identity.createdAt,
+        isPlaceholder: false
+      });
+
+      pendingMagicRestore = null;
+      await closeDialog($("restore-dialog"));
+      renderProfileBadge();
+      setStatus(
+        "Your magic link brought your sweet name home 💗"
+      );
+    } catch (error) {
+      console.error("Could not restore from a magic link:", error);
+      setStatus(
+        "We couldn't switch to that magic link. Please try again 🍭"
+      );
+    }
   }
 
   /* ========================================================
@@ -2401,6 +2621,22 @@
 
   $("profile-badge").addEventListener("click", openProfileDialog);
 
+  $("get-magic-button").addEventListener("click", openMagicLinkDialog);
+
+  $("magic-copy-button").addEventListener("click", () => {
+    void copyMagicLink();
+  });
+
+  $("magic-link-dialog").addEventListener(
+    "close",
+    resetMagicCopyButton
+  );
+
+  $("restore-dialog").addEventListener(
+    "close",
+    forgetPendingMagicRestore
+  );
+
   $("change-name-button").addEventListener("click", enterNameEditMode);
 
   $("name-cancel").addEventListener("click", cancelNameEdit);
@@ -2419,6 +2655,7 @@
   bindSubmit("delete-form", deleteJar);
   bindSubmit("delete-candy-form", deleteCurrentCandy);
   bindSubmit("note-edit-form", saveNoteEdit);
+  bindSubmit("restore-form", restoreMagicIdentity);
 
   window.addEventListener("hashchange", renderRoute);
 
@@ -2445,14 +2682,26 @@
     }
   });
 
+  // Carry any pre-identity ownership over before the first render.
+  migrateLegacyOwnerTokens();
+
+  // A magic link restores the visitor's identity before anything
+  // renders, so badge and jars are already theirs on first paint.
+  adoptMagicIdentityFromUrl();
+
   // Everyone gets a first-visit hello unless they already
-  // picked a name on a previous visit.
+  // picked a name on a previous visit — a magic link counts too.
   if (!getIdentity()) {
     setTimeout(showWelcomeModal, 500);
   }
 
-  // Carry any pre-identity ownership over before the first render.
-  migrateLegacyOwnerTokens();
-
   renderRoute();
+
+  if (magicWelcomeStatus) {
+    // renderRoute clears the status line, greet after it settles.
+    setTimeout(() => {
+      setStatus(magicWelcomeStatus);
+      magicWelcomeStatus = null;
+    }, 100);
+  }
 })();
