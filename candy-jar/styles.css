@@ -1129,6 +1129,200 @@ p {
   font-size: 1rem;
 }
 
+/* Magic link modal */
+
+.visually-hidden-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.magic-entry-button {
+  margin-top: 10px;
+}
+
+.magic-mascot {
+  width: 128px;
+  height: 130px;
+  margin-top: 6px;
+  animation: mascot-bounce 3.2s ease-in-out infinite;
+}
+
+.mascot-arm-wave {
+  transform-box: fill-box;
+  transform-origin: 85% 90%;
+  animation: mascot-wave 2.1s ease-in-out infinite;
+}
+
+.mascot-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mascot-blink 4.4s ease-in-out infinite;
+}
+
+@keyframes mascot-bounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  45% {
+    transform: translateY(-6px) scale(1.02);
+  }
+
+  60% {
+    transform: translateY(1px) scale(.99);
+  }
+}
+
+@keyframes mascot-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  30% {
+    transform: rotate(-22deg);
+  }
+
+  55% {
+    transform: rotate(8deg);
+  }
+
+  75% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes mascot-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  95% {
+    transform: scaleY(.12);
+  }
+}
+
+.mascot-speech {
+  position: relative;
+  max-width: 330px;
+  padding: 13px 17px;
+  border: 2px solid #FFC6DE;
+  border-radius: 18px;
+  background: #FFFFFFF2;
+  box-shadow: 0 6px 18px #A782B01C;
+  text-align: left;
+}
+
+/* The little tail that points up at Mochi */
+
+.mascot-speech::before,
+.mascot-speech::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -7px;
+  border: 7px solid transparent;
+  border-bottom-style: solid;
+  width: 0;
+  height: 0;
+}
+
+.mascot-speech::before {
+  border-bottom-color: #FFC6DE;
+}
+
+.mascot-speech::after {
+  margin-bottom: -3px;
+  border-bottom-color: #FFFFFFF2;
+}
+
+.mascot-speech p {
+  margin: 0;
+  color: #8A5F74;
+  font-size: .88rem;
+  line-height: 1.55;
+}
+
+.magic-link-input,
+#magic-link-input {
+  font-size: .78rem;
+  letter-spacing: .01em;
+  padding: 11px 13px;
+  color: #7C5567;
+}
+
+.magic-copy-button {
+  position: relative;
+  overflow: visible;
+  width: 100%;
+  min-height: 46px;
+  margin-top: 12px;
+}
+
+.magic-copy-button.is-copied {
+  box-shadow:
+    0 0 0 3px #FFD6E8,
+    0 8px 25px #A782B014;
+  animation: copy-button-pop 360ms cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes copy-button-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.06);
+  }
+}
+
+.copy-sparkle {
+  position: absolute;
+  bottom: 100%;
+  font-size: 13px;
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0;
+  text-shadow: 0 1px 2px #FFFFFF;
+  animation: copy-sparkle-pop 900ms cubic-bezier(.3, .75, .45, 1) forwards;
+}
+
+@keyframes copy-sparkle-pop {
+  from {
+    opacity: 1;
+    transform:
+      translate(0, 0)
+      scale(.6)
+      rotate(0deg);
+  }
+
+  to {
+    opacity: 0;
+    transform:
+      translate(var(--spark-dx, 0), var(--spark-dy, -60px))
+      scale(1.05)
+      rotate(16deg);
+  }
+}
+
+.magic-link-hint {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
 /* Delete jar confirmation */
 
 .delete-modal {
@@ -1799,6 +1993,15 @@ p {
 
   .profile-form-actions {
     grid-template-columns: 1fr;
+  }
+
+  .magic-mascot {
+    width: 106px;
+    height: 108px;
+  }
+
+  .mascot-speech {
+    max-width: 100%;
   }
 
   .jars-drawer-panel {
