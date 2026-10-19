@@ -200,9 +200,20 @@
     ).join("");
   }
 
+  /*
+   * A small fixed set of cute candy faces used as a purely
+   * cosmetic username flourish. Uniqueness is never carried by
+   * the display name — the hidden identity token keeps identity
+   * permanent, so two visitors may happily share "Sara 🍬".
+   */
+  const CANDY_SUFFIX_EMOJIS = ["🍬", "🍭", "🍡", "🧁", "🍫"];
+
   function makeUsername(name) {
-    const suffix = crypto.getRandomValues(new Uint16Array(1))[0] % 10000;
-    return `${name}_${String(suffix).padStart(4, "0")}`;
+    const emoji =
+      CANDY_SUFFIX_EMOJIS[
+        crypto.getRandomValues(new Uint8Array(1))[0] % CANDY_SUFFIX_EMOJIS.length
+      ];
+    return `${name} ${emoji}`;
   }
 
   /*
